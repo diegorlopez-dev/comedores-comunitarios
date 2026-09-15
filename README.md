@@ -8,7 +8,7 @@ Trabajo Integrador Final — Programación con IA · UTN.BA
 
 ## 🔗 Links
 
-- **Aplicación en producción:** *(agregar link de Vercel al deployar)*
+- **Aplicación en producción:** https://comedores-comunitarios-5ylmv0y3e-utn-proyecto.vercel.app/
 - **Repositorio:** https://github.com/diegorlopez-dev/comedores-comunitarios
 
 ---
