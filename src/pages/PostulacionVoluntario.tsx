@@ -18,6 +18,7 @@ interface Requerimiento {
 interface Comedor extends ComedorMapa {
   descripcion: string;
   direccion: string;
+  cbu_alias: string | null;
   requerimiento_comedor: Requerimiento[];
   distanciaKm?: number;
 }
@@ -27,6 +28,7 @@ const PostulacionVoluntario: React.FC = () => {
   const [comedoresOriginales, setComedoresOriginales] = useState<Comedor[]>([]);
   const [comedoresMostrar, setComedoresMostrar] = useState<Comedor[]>([]);
   const [postulando, setPostulando] = useState<string | null>(null);
+  const [donacionModal, setDonacionModal] = useState<Comedor | null>(null); // Añadido vía MultiMCP
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
   const [radioKm, setRadioKm] = useState<number>(0); // 0 = sin límite
@@ -46,7 +48,7 @@ const PostulacionVoluntario: React.FC = () => {
     const cargarComedores = async () => {
       const { data, error } = await supabase
         .from('comedor')
-        .select('id, nombre, barrio, direccion, descripcion, latitud, longitud, requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre))');
+        .select('id, nombre, barrio, direccion, descripcion, cbu_alias, latitud, longitud, requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre))');
       if (!error && data) {
         setComedoresOriginales(data as unknown as Comedor[]);
         setComedoresMostrar(data as unknown as Comedor[]);
@@ -175,11 +177,21 @@ const PostulacionVoluntario: React.FC = () => {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-bold text-gray-800">{comedor.nombre}</h3>
-                {comedor.distanciaKm !== undefined && (
-                  <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-lg">
-                    {comedor.distanciaKm < 1 ? 'A cuadras de distancia' : `A ${comedor.distanciaKm.toFixed(1)} km`}
-                  </span>
-                )}
+                <div className="flex gap-2">
+                  {comedor.cbu_alias && (
+                    <button
+                      onClick={() => setDonacionModal(comedor)}
+                      className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-lg transition"
+                    >
+                      ❤️ Donar
+                    </button>
+                  )}
+                  {comedor.distanciaKm !== undefined && (
+                    <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-lg flex items-center">
+                      {comedor.distanciaKm < 1 ? 'A cuadras' : `A ${comedor.distanciaKm.toFixed(1)} km`}
+                    </span>
+                  )}
+                </div>
               </div>
               
               <p className="text-sm text-gray-500">📍 {comedor.barrio} {comedor.direccion && `- ${comedor.direccion}`}</p>
@@ -214,6 +226,35 @@ const PostulacionVoluntario: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Modal de Donación vía MultiMCP */}
+      {donacionModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4"
+          onClick={() => setDonacionModal(null)}
+        >
+          <div
+            className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Apoyá a {donacionModal.nombre}</h2>
+              <button onClick={() => setDonacionModal(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">Podés colaborar transfiriendo directamente a la cuenta del comedor:</p>
+            <div className="bg-gray-50 border border-gray-200 p-3 rounded-lg mb-6 text-center">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">CBU / Alias</p>
+              <p className="text-lg font-mono font-bold text-gray-800 select-all">{donacionModal.cbu_alias}</p>
+            </div>
+            <button 
+              onClick={() => setDonacionModal(null)}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-xl transition"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -16,6 +16,7 @@ const GestionComedor: React.FC = () => {
   const [nombre, setNombre] = useState('');
   const [barrio, setBarrio] = useState('');
   const [descripcion, setDescripcion] = useState('');
+  const [cbuAlias, setCbuAlias] = useState(''); // Incorporado vía MultiMCP
   const [requerimientos, setRequerimientos] = useState<RequerimientoForm[]>([]);
   const [habilidades, setHabilidades] = useState<Habilidad[]>([]);
   const [guardando, setGuardando] = useState(false);
@@ -53,7 +54,7 @@ const GestionComedor: React.FC = () => {
       // Insertar comedor y recuperar el ID con .select()
       const { data: comedorData, error: comedorError } = await supabase
         .from('comedor')
-        .insert([{ nombre, barrio, descripcion, usuario_id: user.id }])
+        .insert([{ nombre, barrio, descripcion, cbu_alias: cbuAlias, usuario_id: user.id }])
         .select('id')
         .single();
 
@@ -132,6 +133,18 @@ const GestionComedor: React.FC = () => {
             onChange={(e) => setDescripcion(e.target.value)}
             placeholder="Contá un poco sobre el comedor, horarios, etc."
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none resize-none"
+          />
+        </div>
+
+        {/* Agregado vía MultiMCP */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">CBU / Alias para donaciones (Opcional)</label>
+          <input
+            type="text"
+            value={cbuAlias}
+            onChange={(e) => setCbuAlias(e.target.value)}
+            placeholder="Ej: comedor.esperanza.mp"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
         </div>
 

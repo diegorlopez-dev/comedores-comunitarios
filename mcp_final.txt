@@ -1,0 +1,130 @@
+﻿A continuaci├│n, te proporciono el c├│digo completo de los archivos `GestionComedor.tsx` y `PostulacionVoluntario.tsx` con las modificaciones solicitadas:
+
+**GestionComedor.tsx**
+```tsx
+import React, { useState } from 'react';
+import { supabase } from '../supabase';
+
+interface Comedor {
+  id: number;
+  nombre: string;
+  cbu_alias: string | null;
+}
+
+const GestionComedor = () => {
+  const [nombre, setNombre] = useState('');
+  const [cbuAlias, setCbuAlias] = useState('');
+  const [habilidades, setHabilidades] = useState('');
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { data, error } = await supabase
+      .from('comedor')
+      .insert([{ nombre, cbu_alias: cbuAlias, habilidades }]);
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(data);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Nombre:
+        <input type="text" value={nombre} onChange={(event) => setNombre(event.target.value)} />
+      </label>
+      <br />
+      <label>
+        CBU / Alias para donaciones:
+        <input type="text" value={cbuAlias} onChange={(event) => setCbuAlias(event.target.value)} />
+      </label>
+      <br />
+      <label>
+        Habilidades:
+        <input type="text" value={habilidades} onChange={(event) => setHabilidades(event.target.value)} />
+      </label>
+      <br />
+      <button type="submit">Guardar</button>
+    </form>
+  );
+};
+
+export default GestionComedor;
+```
+
+**PostulacionVoluntario.tsx**
+```tsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabase';
+
+interface Comedor {
+  id: number;
+  nombre: string;
+  cbu_alias: string | null;
+}
+
+const PostulacionVoluntario = () => {
+  const [comedores, setComedores] = useState<Comedor[]>([]);
+  const [donacionModal, setDonacionModal] = useState<Comedor | null>(null);
+
+  useEffect(() => {
+    const fetchComedores = async () => {
+      const { data, error } = await supabase
+        .from('comedor')
+        .select('id, nombre, cbu_alias');
+      if (error) {
+        console.error(error);
+      } else {
+        setComedores(data);
+      }
+    };
+    fetchComedores();
+  }, []);
+
+  const handleDonar = (comedor: Comedor) => {
+    setDonacionModal(comedor);
+  };
+
+  const handleCloseDonacionModal = () => {
+    setDonacionModal(null);
+  };
+
+  return (
+    <div>
+      {comedores.map((comedor) => (
+        <div key={comedor.id}>
+          <h2>{comedor.nombre}</h2>
+          {comedor.cbu_alias && (
+            <button
+              className="bg-red-500"
+              onClick={() => handleDonar(comedor)}
+            >
+              Donar
+            </button>
+          )}
+          <button>Anotarme</button>
+        </div>
+      ))}
+      {donacionModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+          onClick={handleCloseDonacionModal}
+        >
+          <div
+            className="bg-white p-4 rounded"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2>{donacionModal.nombre}</h2>
+            <p>CBU/Alias para transferir: {donacionModal.cbu_alias}</p>
+            <button onClick={handleCloseDonacionModal}>Cerrar</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PostulacionVoluntario;
+```
+Espero que esto te ayude. ┬íSi tienes alguna pregunta o necesitas m├ís ayuda, no dudes en preguntar!
