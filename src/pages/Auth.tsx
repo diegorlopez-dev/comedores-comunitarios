@@ -99,6 +99,7 @@ export default function Auth() {
                 onChange={e => setRol(e.target.value)} 
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
               >
+                <option value="comensal">Solo quiero encontrar comedores cercanos</option>
                 <option value="voluntario">Quiero ser Voluntario</option>
                 <option value="referente">Soy Referente de un Comedor</option>
               </select>

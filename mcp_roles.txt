@@ -1,0 +1,72 @@
+﻿### FILE 1: Auth.tsx
+```typescript
+// Import necessary dependencies
+import React, { useState } from 'react';
+
+// Registration form component
+const RegistrationForm = () => {
+  const [role, setRole] = useState('');
+  // ... other state variables ...
+
+  return (
+    <form>
+      {/* ... other form fields ... */}
+      <label>
+        Rol:
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="voluntario">Voluntario</option>
+          <option value="referente">Referente</option>
+          <option value="comensal">Comensal</option>
+        </select>
+      </label>
+      {/* ... other form fields ... */}
+    </form>
+  );
+};
+
+// ... other components ...
+```
+
+### FILE 2: PostulacionVoluntario.tsx
+```typescript
+// Import necessary dependencies
+import React, { useState, useEffect } from 'react';
+
+// PostulacionVoluntario component
+const PostulacionVoluntario = () => {
+  const [barrioFiltro, setBarrioFiltro] = useState('');
+  const [comedoresMostrar, setComedoresMostrar] = useState([]);
+  const [comedoresOriginales, setComedoresOriginales] = useState([]);
+  const userId = /* get user ID from authentication context or other means */;
+
+  useEffect(() => {
+    const filteredComedores = comedoresOriginales.filter((comedor) =>
+      comedor.barrio.toLowerCase().includes(barrioFiltro.toLowerCase())
+    );
+    setComedoresMostrar(filteredComedores);
+  }, [barrioFiltro, comedoresOriginales]);
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={barrioFiltro}
+        onChange={(e) => setBarrioFiltro(e.target.value)}
+        placeholder="Buscar por barrio"
+      />
+      {userId && (
+        <button>GPS</button>
+      )}
+      {/* ... other components ... */}
+      {comedoresMostrar.map((comedor) => (
+        <div key={comedor.id}>
+          {/* ... comedor details ... */}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ... other components ...
+```
+Note: In the `PostulacionVoluntario` component, I assume that `comedoresOriginales` is an array of comedor objects that is fetched from an API or other data source. The `useEffect` hook is used to filter the comedores based on the `barrioFiltro` state variable. The filtered comedores are then stored in the `comedoresMostrar` state variable. The GPS button is only shown when the user is logged in (i.e., `userId` is truthy).

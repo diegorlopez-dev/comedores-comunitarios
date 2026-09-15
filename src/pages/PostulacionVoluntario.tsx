@@ -31,6 +31,7 @@ const PostulacionVoluntario: React.FC = () => {
   const [donacionModal, setDonacionModal] = useState<Comedor | null>(null); // Añadido vía MultiMCP
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
+  const [barrioFiltro, setBarrioFiltro] = useState('');
   const [radioKm, setRadioKm] = useState<number>(0); // 0 = sin límite
 
   const navigate = useNavigate();
@@ -62,6 +63,13 @@ const PostulacionVoluntario: React.FC = () => {
   useEffect(() => {
     let lista = [...comedoresOriginales];
 
+    // Filtro por barrio (para todos, incluso sin login)
+    if (barrioFiltro.trim()) {
+      lista = lista.filter(c =>
+        c.barrio.toLowerCase().includes(barrioFiltro.toLowerCase())
+      );
+    }
+
     if (userLocation) {
       // Calcular distancias
       lista = lista.map(c => {
@@ -84,7 +92,7 @@ const PostulacionVoluntario: React.FC = () => {
     }
 
     setComedoresMostrar(lista);
-  }, [userLocation, radioKm, comedoresOriginales]);
+  }, [userLocation, radioKm, barrioFiltro, comedoresOriginales]);
 
   const handleObtenerUbicacion = () => {
     setBuscandoUbicacion(true);
@@ -134,28 +142,43 @@ const PostulacionVoluntario: React.FC = () => {
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-green-800">🤝 Encontrá un Comedor</h2>
-          <p className="text-gray-600">Buscá comedores cerca tuyo y postulate como voluntario.</p>
+          <h2 className="text-2xl font-bold text-green-800">Encontrá un Comedor</h2>
+          <p className="text-gray-600">
+            {userId ? 'Usá tu ubicación o buscá por barrio.' : 'Buscá por barrio o registrate para usar el GPS.'}
+          </p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3">
-          <select 
-            value={radioKm} 
-            onChange={(e) => setRadioKm(Number(e.target.value))}
-            className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 font-medium"
-          >
-            <option value={0}>Todos los comedores</option>
-            <option value={2}>A menos de 2 km</option>
-            <option value={5}>A menos de 5 km</option>
-            <option value={10}>A menos de 10 km</option>
-          </select>
-          <button 
-            onClick={handleObtenerUbicacion}
-            disabled={buscandoUbicacion}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition"
-          >
-            {buscandoUbicacion ? '📍 Buscando...' : '📍 Usar mi ubicación'}
-          </button>
+          {/* Filtro por barrio - disponible para todos */}
+          <input
+            type="text"
+            value={barrioFiltro}
+            onChange={(e) => setBarrioFiltro(e.target.value)}
+            placeholder="Buscar por barrio..."
+            className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 flex-1"
+          />
+          {/* Solo para usuarios logueados */}
+          {userId && (
+            <>
+              <select 
+                value={radioKm} 
+                onChange={(e) => setRadioKm(Number(e.target.value))}
+                className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 font-medium"
+              >
+                <option value={0}>Todos los comedores</option>
+                <option value={2}>A menos de 2 km</option>
+                <option value={5}>A menos de 5 km</option>
+                <option value={10}>A menos de 10 km</option>
+              </select>
+              <button 
+                onClick={handleObtenerUbicacion}
+                disabled={buscandoUbicacion}
+                className="flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition"
+              >
+                {buscandoUbicacion ? '📍 Buscando...' : '📍 Mi ubicación'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
