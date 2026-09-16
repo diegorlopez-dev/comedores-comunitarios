@@ -1,0 +1,141 @@
+﻿Aqu├¡ te dejo el componente `DirectorioComedores.tsx` modificado para incorporar el sistema de rese├▒as:
+```tsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabase';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from '../components/Modal';
+
+interface Comedor {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  resenas: {
+    id: number;
+    puntuacion: number;
+    comentario: string;
+  }[];
+}
+
+interface Usuario {
+  rol: {
+    nombre: string;
+  };
+}
+
+const DirectorioComedores = () => {
+  const [comedores, setComedores] = useState<Comedor[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedComedor, setSelectedComedor] = useState<Comedor | null>(null);
+  const [puntuacion, setPuntuacion] = useState<number>(0);
+  const [comentario, setComentario] = useState<string>('');
+
+  useEffect(() => {
+    const verificarSesion = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data.session) {
+        const userId = data.session.user.id;
+        const { data: usuarioData, error: usuarioError } = await supabase
+          .from('usuario')
+          .select('rol(nombre)')
+          .eq('id', userId);
+        if (usuarioData && usuarioData.length > 0) {
+          setUserRole(usuarioData[0].rol.nombre);
+        }
+      }
+    };
+    verificarSesion();
+  }, []);
+
+  useEffect(() => {
+    const cargarComedores = async () => {
+      const { data, error } = await supabase
+        .from('comedor')
+        .select('id, nombre, descripcion, resena(id, puntuacion, comentario)');
+      if (data) {
+        setComedores(data);
+      }
+    };
+    cargarComedores();
+  }, []);
+
+  const calcularPromedioEstrellas = (resenas: any[]) => {
+    const sum = resenas.reduce((acc, resena) => acc + resena.puntuacion, 0);
+    return sum / resenas.length;
+  };
+
+  const handleVerResenas = (comedor: Comedor) => {
+    setSelectedComedor(comedor);
+    setModalOpen(true);
+  };
+
+  const handleDejarResena = async () => {
+    if (userRole === 'comensal') {
+      const { data, error } = await supabase.from('resena').insert([
+        {
+          comedor_id: selectedComedor!.id,
+          puntuacion,
+          comentario,
+        },
+      ]);
+      if (data) {
+        setModalOpen(false);
+        setPuntuacion(0);
+        setComentario('');
+      }
+    }
+  };
+
+  return (
+    <div>
+      {comedores.map((comedor) => (
+        <div key={comedor.id}>
+          <h2>{comedor.nombre}</h2>
+          <p>{comedor.descripcion}</p>
+          <p>
+            Promedio de estrellas: {calcularPromedioEstrellas(comedor.resenas).toFixed(2)}
+          </p>
+          <button onClick={() => handleVerResenas(comedor)}>Ver/Escribir Rese├▒as</button>
+        </div>
+      ))}
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+        <ModalHeader>
+          Rese├▒as de {selectedComedor?.nombre}
+        </ModalHeader>
+        <ModalBody>
+          {selectedComedor?.resenas.map((resena) => (
+            <div key={resena.id}>
+              <p>Puntuaci├│n: {resena.puntuacion}</p>
+              <p>Comentario: {resena.comentario}</p>
+            </div>
+          ))}
+          {userRole === 'comensal' ? (
+            <form>
+              <label>Puntuaci├│n:</label>
+              <input
+                type="number"
+                min="1"
+                max="5"
+                value={puntuacion}
+                onChange={(e) => setPuntuacion(parseInt(e.target.value))}
+              />
+              <br />
+              <label>Comentario:</label>
+              <textarea value={comentario} onChange={(e) => setComentario(e.target.value)} />
+              <br />
+              <button onClick={handleDejarResena}>Dejar rese├▒a</button>
+            </form>
+          ) : (
+            <p>Solo los comensales pueden dejar rese├▒as</p>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <button onClick={() => setModalOpen(false)}>Cerrar</button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+};
+
+export default DirectorioComedores;
+```
+Espero que esto te ayude. ┬íSi tienes alguna pregunta o necesitas m├ís ayuda, no dudes en preguntar!
