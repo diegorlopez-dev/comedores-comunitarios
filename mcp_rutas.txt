@@ -1,0 +1,48 @@
+﻿**TAREA 1: Reescribir App.tsx**
+
+Aqu├¡ te dejo el c├│digo reescrito de `App.tsx`:
+```tsx
+// App.tsx
+import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import DirectorioComedores from './pages/DirectorioComedores';
+import PanelVoluntario from './pages/PanelVoluntario';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<DirectorioComedores />} />
+        <Route path="/colaborar" element={<PanelVoluntario />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+**TAREA 2: Escribe el c├│digo inicial para PanelVoluntario.tsx**
+
+Aqu├¡ te dejo el c├│digo inicial para `PanelVoluntario.tsx`:
+```tsx
+// PanelVoluntario.tsx
+import React from 'react';
+
+function PanelVoluntario() {
+  return (
+    <div className="container mx-auto p-4 pt-6 md:p-6 lg:p-12 xl:p-24">
+      <h1 className="text-3xl font-bold mb-4">Panel de Voluntario</h1>
+      <p className="text-lg mb-6">Tus postulaciones activas aparecer├ín aqu├¡</p>
+    </div>
+  );
+}
+
+export default PanelVoluntario;
+```
+**Marcadores**
+
+* Se ha eliminado el componente `Home` hardcodeado en `App.tsx`.
+* Se ha importado el componente `DirectorioComedores` de `./pages/DirectorioComedores` y se renderiza en la ruta `/`.
+* Se ha importado el componente `PanelVoluntario` de `./pages/PanelVoluntario` y se renderiza en la ruta `/colaborar`.
+* Se ha creado el componente `PanelVoluntario` con un t├¡tulo y un p├írrafo que indica que las postulaciones activas aparecer├ín all├¡.
+* Se ha utilizado Tailwind para dar estilo al componente `PanelVoluntario`.

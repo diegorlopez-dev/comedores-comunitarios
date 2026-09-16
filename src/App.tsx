@@ -5,113 +5,12 @@ import { supabase } from './supabaseClient';
 import Auth from './pages/Auth';
 import Perfil from './pages/Perfil';
 import GestionComedor from './pages/GestionComedor';
-import PostulacionVoluntario from './pages/PostulacionVoluntario';
+import DirectorioComedores from './pages/DirectorioComedores';
+import PanelVoluntario from './pages/PanelVoluntario';
 
-// Tipos para TypeScript basados en nuestro esquema de Supabase
-type Habilidad = {
-  nombre: string;
-};
+// Componentes de la aplicación
 
-type Requerimiento = {
-  id: string;
-  cantidad_necesaria: number;
-  habilidad: Habilidad;
-  // Para el MVP asumimos que faltan todos, luego calcularemos las colaboraciones confirmadas
-};
-
-type Comedor = {
-  id: string;
-  nombre: string;
-  barrio: string;
-  descripcion: string;
-  requerimiento_comedor: Requerimiento[];
-};
-
-function Home() {
-  const [comedores, setComedores] = useState<Comedor[]>([]);
-  const [busqueda, setBusqueda] = useState('');
-  const [cargando, setCargando] = useState(true);
-
-  useEffect(() => {
-    async function fetchComedores() {
-      // Hacemos un JOIN a través de Supabase: Comedores -> Requerimientos -> Habilidades
-      const { data, error } = await supabase
-        .from('comedor')
-        .select(`
-          id, nombre, barrio, descripcion,
-          requerimiento_comedor (
-            id, cantidad_necesaria,
-            habilidad ( nombre )
-          )
-        `);
-
-      if (error) {
-        console.error('Error cargando comedores:', error);
-      } else {
-        setComedores(data as unknown as Comedor[]);
-      }
-      setCargando(false);
-    }
-    fetchComedores();
-  }, []);
-
-  const comedoresFiltrados = comedores.filter(c => 
-    c.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
-    c.barrio?.toLowerCase().includes(busqueda.toLowerCase())
-  );
-
-  return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Comedores cerca de vos</h2>
-      
-      {/* Buscador */}
-      <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 flex items-center mb-6 focus-within:ring-2 focus-within:ring-green-400">
-        <Search className="text-gray-400 ml-2" size={20} />
-        <input 
-          type="text" 
-          placeholder="Buscar por nombre o barrio..." 
-          className="w-full p-2 outline-none"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
-      </div>
-
-      {/* Listado de Comedores */}
-      <div className="space-y-4">
-        {cargando ? (
-          <p className="text-center text-gray-500 mt-10">Cargando comedores...</p>
-        ) : comedoresFiltrados.length === 0 ? (
-          <p className="text-center text-gray-500 mt-10">No se encontraron comedores.</p>
-        ) : (
-          comedoresFiltrados.map((comedor) => (
-            <div key={comedor.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="font-bold text-lg text-gray-800">{comedor.nombre}</h3>
-                  <p className="text-sm text-gray-500">📍 {comedor.barrio}</p>
-                </div>
-                {comedor.requerimiento_comedor?.length > 0 && (
-                  <span className="bg-coral-100 text-coral-600 text-xs font-semibold px-2 py-1 rounded-full">
-                    Faltan voluntarios
-                  </span>
-                )}
-              </div>
-              <p className="text-sm text-gray-600 mt-2 mb-4 line-clamp-2">{comedor.descripcion}</p>
-              
-              <div className="flex gap-2 flex-wrap">
-                {comedor.requerimiento_comedor?.map((req) => (
-                  <span key={req.id} className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full border border-green-200">
-                    {req.habilidad.nombre} 0/{req.cantidad_necesaria}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
+// El componente Home fue reemplazado por DirectorioComedores
 
 import { useLocation } from 'react-router-dom';
 
@@ -180,11 +79,11 @@ function App() {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<DirectorioComedores />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/gestionar-comedor" element={<GestionComedor />} />
-          <Route path="/colaborar" element={<PostulacionVoluntario />} />
+          <Route path="/colaborar" element={<PanelVoluntario />} />
         </Routes>
       </Layout>
     </Router>
