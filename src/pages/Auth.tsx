@@ -6,6 +6,7 @@ import { Eye, EyeOff } from 'lucide-react';
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [registroExitoso, setRegistroExitoso] = useState(false);
   
   // Campos del formulario
   const [email, setEmail] = useState('');
@@ -48,12 +49,14 @@ export default function Auth() {
             }
           }
         });
-        if (error) throw error;
-        
-        alert('¡Registro exitoso! Ya puedes iniciar sesión con tus datos.');
-        setIsLogin(true);
-        setPassword('');
-        setConfirmPassword('');
+        if (error) {
+          if (error.message.includes('User already registered') || error.message.includes('already been registered')) {
+            throw new Error('Ese email ya está registrado. Por favor, iniciá sesión.');
+          }
+          throw error;
+        }
+        // Mostrar pantalla de "revisá tu email"
+        setRegistroExitoso(true);
       }
     } catch (error: any) {
       // Traducir algunos errores comunes
@@ -69,6 +72,18 @@ export default function Auth() {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
+
+      {registroExitoso ? (
+        <div className="text-center py-8">
+          <div className="text-5xl mb-4">📧</div>
+          <h2 className="text-2xl font-bold text-green-800 mb-3">¡Revisá tu email!</h2>
+          <p className="text-gray-600 mb-6">Te enviamos un link de confirmación a <strong>{email}</strong>. Hacé clic en ese link para activar tu cuenta.</p>
+          <button onClick={() => { setRegistroExitoso(false); setIsLogin(true); }} className="text-green-600 font-bold hover:underline">
+            Ya confirmé, iniciar sesión →
+          </button>
+        </div>
+      ) : (
+      <>
       <h2 className="text-2xl font-bold text-green-800 mb-6 text-center">
         {isLogin ? 'Iniciar Sesión' : 'Unirse a la Red Solidaria'}
       </h2>
@@ -179,6 +194,8 @@ export default function Auth() {
           {isLogin ? "Registrate acá" : "Iniciá sesión"}
         </button>
       </div>
+      </>
+      )}
     </div>
   );
 }

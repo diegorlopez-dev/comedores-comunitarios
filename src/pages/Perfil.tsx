@@ -20,6 +20,7 @@ export default function Perfil() {
   const [profile, setProfile] = useState<UsuarioProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [accessDenied, setAccessDenied] = useState<boolean>(false);
+  const [comedorExistente, setComedorExistente] = useState<{ id: string; nombre: string; barrio: string } | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -46,6 +47,15 @@ export default function Perfil() {
           setAccessDenied(true);
         } else {
           setProfile(data as UsuarioProfile);
+          // Si es referente, busca si ya tiene un comedor creado
+          if (data.rol?.nombre === 'referente') {
+            const { data: comedorData } = await supabase
+              .from('comedor')
+              .select('id, nombre, barrio')
+              .eq('usuario_id', user.id)
+              .single();
+            if (comedorData) setComedorExistente(comedorData);
+          }
         }
       } catch (error) {
         console.error('Error inesperado:', error);
@@ -150,24 +160,34 @@ export default function Perfil() {
         {esReferente && (
           <section className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-400/40 p-6 rounded-2xl shadow-md">
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-bold text-amber-900">
-                🛠️ Panel Referente
-              </h2>
+              <h2 className="text-xl font-bold text-amber-900">🛠️ Panel Referente</h2>
             </div>
-            <p className="text-slate-700 text-sm mb-6">
-              Módulo habilitado únicamente para referentes de comedores.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => navigate('/gestionar-comedor')}
-                className="bg-white p-4 rounded-xl border border-amber-200 shadow-sm font-bold text-amber-700 hover:bg-amber-50"
-              >
-                + Crear/Editar Comedor
-              </button>
-              <button className="bg-white p-4 rounded-xl border border-amber-200 shadow-sm font-bold text-amber-700 hover:bg-amber-50">
-                Ver Postulantes
-              </button>
-            </div>
+
+            {comedorExistente ? (
+              <>
+                <div className="bg-white p-4 rounded-xl border border-amber-200 mb-4">
+                  <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">Tu Comedor</p>
+                  <p className="text-lg font-bold text-amber-800">{comedorExistente.nombre}</p>
+                  <p className="text-sm text-slate-500">📍 {comedorExistente.barrio}</p>
+                </div>
+                <button
+                  onClick={() => navigate('/colaborar')}
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl font-bold transition"
+                >
+                  Ver Postulantes
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-slate-700 text-sm mb-6">Todavía no registraste tu comedor.</p>
+                <button
+                  onClick={() => navigate('/gestionar-comedor')}
+                  className="w-full bg-white p-4 rounded-xl border border-amber-200 shadow-sm font-bold text-amber-700 hover:bg-amber-50"
+                >
+                  + Registrar mi Comedor
+                </button>
+              </>
+            )}
           </section>
         )}
 

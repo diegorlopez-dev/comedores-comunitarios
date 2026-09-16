@@ -1,0 +1,46 @@
+﻿### Modified Sections of Perfil.tsx
+
+#### State and Effect
+```typescript
+import { useState, useEffect } from 'react';
+import { supabase } from '../supabase';
+
+const [comedorExistente, setComedorExistente] = useState<{ id: number; nombre: string; barrio: string } | null>(null);
+
+useEffect(() => {
+  const fetchComedor = async () => {
+    if (user.id) {
+      const { data, error } = await supabase
+        .from('comedor')
+        .select('id, nombre, barrio')
+        .eq('usuario_id', user.id)
+        .single();
+
+      if (data) {
+        setComedorExistente(data);
+      } else {
+        setComedorExistente(null);
+      }
+    }
+  };
+
+  fetchComedor();
+}, [user.id]);
+```
+
+#### Conditional Rendering
+```typescript
+{
+  comedorExistente ? (
+    <div>
+      <h2>{comedorExistente.nombre}</h2>
+      <p>{comedorExistente.barrio}</p>
+      <button onClick={() => navigate('/colaborar')}>Ver Postulantes</button>
+    </div>
+  ) : (
+    <button>Registrar mi Comedor</button>
+  );
+}
+```
+
+Note: Make sure to handle any potential errors that may occur during the fetch operation. The above code assumes that error handling is already implemented elsewhere in the application. If not, consider adding error handling to the `fetchComedor` function.
