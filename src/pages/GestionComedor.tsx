@@ -238,7 +238,7 @@ const GestionComedor: React.FC = () => {
 
         <button
           type="submit"
-          disabled={guardando}
+          disabled={guardando || !nombre.trim() || !barrio.trim() || !direccion.trim() || !diasYHorarios.trim()}
           className="w-full bg-green-600 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-green-700 disabled:opacity-50 transition-colors"
         >
           {guardando ? 'Guardando...' : 'Guardar Comedor'}

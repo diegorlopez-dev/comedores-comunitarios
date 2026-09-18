@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -31,6 +31,9 @@ export interface ComedorMapa {
   barrio: string;
   latitud: number | null;
   longitud: number | null;
+  direccion?: string;
+  dias_y_horarios?: string;
+  resena?: { puntuacion: number }[];
 }
 
 interface MapaComedoresProps {
@@ -65,8 +68,8 @@ const MapaComedores: React.FC<MapaComedoresProps> = ({ comedores, userLocation }
           <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
             <Popup>
               <div className="text-center">
-                <strong className="text-red-600">¡Estás acá!</strong>
-                <p className="text-xs text-gray-500 m-0">Tu ubicación actual</p>
+                <strong className="text-red-600">Â¡EstÃ¡s acÃ¡!</strong>
+                <p className="text-xs text-gray-500 m-0">Tu ubicaciÃ³n actual</p>
               </div>
             </Popup>
           </Marker>
@@ -74,11 +77,18 @@ const MapaComedores: React.FC<MapaComedoresProps> = ({ comedores, userLocation }
 
         {comedores.map(c => {
           if (c.latitud && c.longitud) {
+            const prom = c.resena && c.resena.length > 0 
+              ? (c.resena.reduce((a, b) => a + b.puntuacion, 0) / c.resena.length).toFixed(1) 
+              : null;
             return (
               <Marker key={c.id} position={[c.latitud, c.longitud]}>
                 <Popup>
-                  <strong>{c.nombre}</strong><br/>
-                  📍 {c.barrio}
+                  <div className="text-sm">
+                    <strong className="text-base text-gray-800">{c.nombre}</strong><br/>
+                    {prom && <span className="text-xs text-yellow-600 font-bold">⭐ {prom} / 5</span>}<br/>
+                    <span className="text-gray-600">📍 {c.barrio} {c.direccion && `- ${c.direccion}`}</span><br/>
+                    {c.dias_y_horarios && <span className="text-gray-500 text-xs">🕒 {c.dias_y_horarios}</span>}
+                  </div>
                 </Popup>
               </Marker>
             );
@@ -91,3 +101,5 @@ const MapaComedores: React.FC<MapaComedoresProps> = ({ comedores, userLocation }
 };
 
 export default MapaComedores;
+
+
