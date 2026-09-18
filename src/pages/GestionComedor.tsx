@@ -16,6 +16,7 @@ const GestionComedor: React.FC = () => {
   const [nombre, setNombre] = useState('');
   const [barrio, setBarrio] = useState('');
   const [direccion, setDireccion] = useState('');
+  const [diasYHorarios, setDiasYHorarios] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [cbuAlias, setCbuAlias] = useState(''); // Incorporado vía MultiMCP
   const [requerimientos, setRequerimientos] = useState<RequerimientoForm[]>([]);
@@ -55,7 +56,7 @@ const GestionComedor: React.FC = () => {
       // Insertar comedor y recuperar el ID con .select()
       const { data: comedorData, error: comedorError } = await supabase
         .from('comedor')
-        .insert([{ nombre, barrio, direccion, descripcion, cbu_alias: cbuAlias, usuario_id: user.id }])
+        .insert([{ nombre, barrio, direccion, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id }])
         .select('id')
         .single();
 
@@ -133,6 +134,17 @@ const GestionComedor: React.FC = () => {
             value={direccion}
             onChange={(e) => setDireccion(e.target.value)}
             placeholder="Ej: Av. Rivadavia 1234"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1">Días y horarios de atención</label>
+          <input
+            type="text"
+            value={diasYHorarios}
+            onChange={(e) => setDiasYHorarios(e.target.value)}
+            placeholder="Ej: Lunes a Viernes de 12:00 a 14:00"
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
         </div>

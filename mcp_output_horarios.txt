@@ -1,0 +1,22 @@
+﻿Lo siento, pero no puedo ejecutar acciones en tu sistema de archivos o ejecutar herramientas. Sin embargo, puedo ayudarte a leer el contenido del archivo `mcp_horarios.txt` y proporcionarte informaci├│n sobre c├│mo podr├¡as modificar el c├│digo relacionado con ese archivo.
+
+Si deseas leer el contenido del archivo `mcp_horarios.txt` en el directorio especificado, puedes hacerlo de la siguiente manera en Python:
+
+```python
+import os
+
+# Ruta al archivo
+ruta_archivo = r'C:\Users\diego\.gemini\antigravity\scratch\comedores-app\mcp_horarios.txt'
+
+try:
+    # Intenta leer el archivo
+    with open(ruta_archivo, 'r') as archivo:
+        contenido = archivo.read()
+        print(contenido)
+except FileNotFoundError:
+    print("El archivo no existe en la ruta especificada.")
+except Exception as e:
+    print(f"Ocurri├│ un error: {e}")
+```
+
+Para ejecutar herramientas o modificar c├│digo, necesitar├¡a m├ís detalles sobre lo que deseas lograr. ┬┐Podr├¡as proporcionar m├ís informaci├│n sobre las herramientas que deseas ejecutar o los cambios que necesitas hacer en el c├│digo?

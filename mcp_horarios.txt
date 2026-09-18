@@ -1,0 +1,14 @@
+CRÍTICO Y OBLIGATORIO: DEBES USAR LAS HERRAMIENTAS (TOOLS) PARA MODIFICAR LOS ARCHIVOS DIRECTAMENTE. NO ESCRIBAS UN TUTORIAL O EXPLICACIÓN. SOLO EJECUTA LAS HERRAMIENTAS DE EDICIÓN DE ARCHIVOS.
+
+Realiza las siguientes modificaciones exactas:
+
+1. Edita `src/pages/GestionComedor.tsx`:
+   - Agrega el input de texto en el formulario de React para pedir "Días y horarios de atención".
+   - Asegúrate de agregar `dias_y_horarios: diasYHorarios` en el objeto que se envía a supabase en la línea de `supabase.from('comedor').insert([...])`. (El estado `diasYHorarios` ya lo creé yo).
+
+2. Edita `src/pages/DirectorioComedores.tsx`:
+   - En la interfaz `Comedor`, agrega: `dias_y_horarios?: string;`
+   - En el useEffect que carga comedores, modifica el string del `.select(...)` para incluir `dias_y_horarios`.
+   - En el JSX donde se renderiza la tarjeta del comedor, justo debajo de la dirección (📍), agrega una línea que muestre el horario así: `🕒 {comedor.dias_y_horarios}`.
+
+Si no usas herramientas y solo devuelves texto, habrás fallado.
