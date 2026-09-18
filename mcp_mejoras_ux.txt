@@ -1,0 +1,111 @@
+INSTRUCCIÓN OBLIGATORIA: Debes editar archivos usando tools. No respondas con texto ni tutoriales. Solo edita los archivos.
+
+Proyecto: C:\Users\diego\.gemini\antigravity\scratch\comedores-app\src\pages\
+
+=== TAREA 1: Auth.tsx - 5 mejoras en el formulario de registro ===
+
+Archivo: Auth.tsx
+
+1a) Cambiar el label "Nombre Completo" por "Nombre y Apellido"
+
+1b) Cambiar el texto de la opción de comensal en el select:
+    ANTES: Solo quiero encontrar comedores cercanos
+    DESPUÉS: Asistente/Comensal
+
+1c) Agregar estado de validación de contraseñas en tiempo real. Agrega este estado nuevo:
+    const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(null);
+    
+    Y modifica el handler de confirmPassword para que actualice este estado:
+    onChange={e => { setConfirmPassword(e.target.value); setPasswordsMatch(e.target.value === password); }}
+    
+    Debajo del input de "Repetir Contraseña", agrega este mensaje condicional:
+    {confirmPassword.length > 0 && (
+      <p className={`text-xs mt-1 ${passwordsMatch ? 'text-green-600' : 'text-red-500'}`}>
+        {passwordsMatch ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
+      </p>
+    )}
+
+1d) Deshabilitar el botón de "Registrarme" si:
+    - Algún campo obligatorio está vacío (nombre, email, password vacíos)
+    - Las contraseñas no coinciden (solo en modo registro)
+    
+    Modifica el botón de submit para que tenga disabled cuando aplique:
+    disabled={isLoading || (!isLogin && (
+      !nombre.trim() || !email.trim() || !password || !confirmPassword || password !== confirmPassword
+    ))}
+
+1e) El "error inesperado" al loguearse justo después de registrarse es porque Supabase retorna un error con message vacío o undefined en ciertos estados de sesión. El bloque catch ya tiene la traducción correcta, pero asegúrate que en el signInWithPassword, si el login fue exitoso pero la sesión no está lista inmediatamente, espere un momento. Modifica el bloque de login así:
+    
+    if (isLogin) {
+      const { data: loginData, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      if (loginData.session) {
+        navigate('/perfil');
+      }
+    }
+
+=== TAREA 2: DirectorioComedores.tsx - mostrar teléfono del referente ===
+
+Archivo: DirectorioComedores.tsx
+
+2a) En la interfaz Comedor, agrega:
+    usuario?: { telefono?: string; nombre?: string };
+
+2b) En el .select() de la query principal (línea 72), agrega al final el join del usuario:
+    Cambia el select para incluir: usuario:usuario_id(telefono, nombre)
+    El select completo quedaría:
+    .select('id, nombre, barrio, direccion, dias_y_horarios, descripcion, cbu_alias, latitud, longitud, usuario:usuario_id(telefono, nombre), requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre)), resena(id, puntuacion, comentario)')
+
+2c) En el JSX de la tarjeta del comedor, debajo del div que muestra cbu_alias (la parte de donaciones), agrega:
+    {comedor.usuario?.telefono && (
+      <p className="text-sm text-gray-500 mt-1">📞 Contacto referente: {comedor.usuario.telefono}</p>
+    )}
+
+=== TAREA 3: Perfil.tsx - sección para editar datos personales ===
+
+Archivo: Perfil.tsx
+
+3a) Agrega los estados necesarios para edición de perfil al inicio del componente (junto a los otros useState):
+    const [editandoPerfil, setEditandoPerfil] = useState(false);
+    const [editNombre, setEditNombre] = useState('');
+    const [editTelefono, setEditTelefono] = useState('');
+    const [guardandoPerfil, setGuardandoPerfil] = useState(false);
+    const [perfilMsg, setPerfilMsg] = useState('');
+
+3b) Agrega una función handleGuardarPerfil antes del return:
+    const handleGuardarPerfil = async () => {
+      setGuardandoPerfil(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase.from('usuario').update({ nombre: editNombre, telefono: editTelefono }).eq('id', user.id);
+      if (!error) {
+        setProfile(prev => prev ? { ...prev, nombre: editNombre, telefono: editTelefono } : prev);
+        setPerfilMsg('¡Datos actualizados!');
+        setEditandoPerfil(false);
+      }
+      setGuardandoPerfil(false);
+    };
+
+3c) En la sección "Tus Datos" (section con className que incluye "Tus Datos"), debajo del grid de datos, agrega un botón para editar y el formulario inline:
+    
+    <div className="mt-4">
+      {!editandoPerfil ? (
+        <button onClick={() => { setEditNombre(profile.nombre || ''); setEditTelefono(profile.telefono || ''); setEditandoPerfil(true); }} className="text-sm text-green-600 font-semibold hover:underline">
+          ✏️ Editar mis datos
+        </button>
+      ) : (
+        <div className="space-y-3 mt-3">
+          <input type="text" value={editNombre} onChange={e => setEditNombre(e.target.value)} placeholder="Nombre y Apellido" className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-400 outline-none" />
+          <input type="tel" value={editTelefono} onChange={e => setEditTelefono(e.target.value)} placeholder="Teléfono de contacto" className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-400 outline-none" />
+          {perfilMsg && <p className="text-green-600 text-sm">{perfilMsg}</p>}
+          <div className="flex gap-2">
+            <button onClick={handleGuardarPerfil} disabled={guardandoPerfil} className="flex-1 bg-green-600 text-white text-sm font-bold py-2 rounded-lg hover:bg-green-700 disabled:opacity-50">
+              {guardandoPerfil ? 'Guardando...' : 'Guardar'}
+            </button>
+            <button onClick={() => { setEditandoPerfil(false); setPerfilMsg(''); }} className="flex-1 bg-gray-100 text-gray-700 text-sm font-bold py-2 rounded-lg hover:bg-gray-200">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>

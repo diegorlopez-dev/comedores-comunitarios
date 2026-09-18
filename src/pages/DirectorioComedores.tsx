@@ -29,6 +29,7 @@ interface Comedor extends ComedorMapa {
   requerimiento_comedor: Requerimiento[];
   resena: Resena[]; // Agregado vía MultiMCP
   distanciaKm?: number;
+  usuario?: { telefono?: string; nombre?: string };
 }
 
 const PostulacionVoluntario: React.FC = () => {
@@ -69,7 +70,7 @@ const PostulacionVoluntario: React.FC = () => {
     const cargarComedores = async () => {
       const { data, error } = await supabase
         .from('comedor')
-        .select('id, nombre, barrio, direccion, dias_y_horarios, descripcion, cbu_alias, latitud, longitud, requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre)), resena(id, puntuacion, comentario)');
+        .select('id, nombre, barrio, direccion, dias_y_horarios, descripcion, cbu_alias, latitud, longitud, usuario:usuario_id(telefono, nombre), requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre)), resena(id, puntuacion, comentario)');
       if (!error && data) {
         setComedoresOriginales(data as unknown as Comedor[]);
         setComedoresMostrar(data as unknown as Comedor[]);
@@ -290,6 +291,7 @@ const PostulacionVoluntario: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-500">📍 {comedor.barrio} {comedor.direccion && `- ${comedor.direccion}`}</p>
                   {comedor.dias_y_horarios && <p className="text-sm text-gray-500 mt-1">🕒 {comedor.dias_y_horarios}</p>}
+                  {comedor.usuario?.telefono && <p className="text-sm text-gray-500 mt-1">📞 {comedor.usuario.telefono}</p>}
                   <p className="text-sm text-gray-600 mt-2 line-clamp-2">{comedor.descripcion}</p>
                 </div>
                 <button

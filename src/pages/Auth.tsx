@@ -18,6 +18,7 @@ export default function Auth() {
   // UI states
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(null);
   
   const navigate = useNavigate();
 
@@ -26,7 +27,6 @@ export default function Auth() {
     setIsLoading(true);
     setErrorMsg('');
 
-    // Validación de contraseñas para registro
     if (!isLogin && password !== confirmPassword) {
       setErrorMsg('Las contraseñas no coinciden. Por favor, verificalas.');
       setIsLoading(false);
@@ -35,18 +35,17 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data: loginData, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate('/perfil');
+        if (loginData.session) {
+          navigate('/perfil');
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: {
-              nombre,
-              rol
-            }
+            data: { nombre, rol }
           }
         });
         if (error) {
@@ -55,7 +54,6 @@ export default function Auth() {
           }
           throw error;
         }
-        // Mostrar pantalla de "revisá tu email"
         setRegistroExitoso(true);
       }
     } catch (error: any) {
@@ -79,6 +77,10 @@ export default function Auth() {
       setIsLoading(false);
     }
   };
+
+  const isFormValid = isLogin 
+    ? email.trim() !== '' && password.trim() !== ''
+    : email.trim() !== '' && password.trim() !== '' && nombre.trim() !== '' && confirmPassword.trim() !== '' && password === confirmPassword;
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -108,7 +110,7 @@ export default function Auth() {
         {!isLogin && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
               <input 
                 required 
                 type="text" 
@@ -124,7 +126,7 @@ export default function Auth() {
                 onChange={e => setRol(e.target.value)} 
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
               >
-                <option value="comensal">Solo quiero encontrar comedores cercanos</option>
+                <option value="comensal">Asistente/Comensal</option>
                 <option value="voluntario">Quiero ser Voluntario</option>
                 <option value="referente">Soy Referente de un Comedor</option>
               </select>
@@ -150,7 +152,10 @@ export default function Auth() {
               required 
               type={showPassword ? "text" : "password"} 
               value={password} 
-              onChange={e => setPassword(e.target.value)} 
+              onChange={e => {
+                setPassword(e.target.value);
+                if (confirmPassword) setPasswordsMatch(e.target.value === confirmPassword);
+              }} 
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none pr-10" 
               minLength={6}
             />
@@ -172,18 +177,25 @@ export default function Auth() {
                 required 
                 type={showPassword ? "text" : "password"} 
                 value={confirmPassword} 
-                onChange={e => setConfirmPassword(e.target.value)} 
+                onChange={e => {
+                  setConfirmPassword(e.target.value);
+                  setPasswordsMatch(e.target.value === password);
+                }} 
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none pr-10" 
                 minLength={6}
               />
-              {/* Opcional: el mismo botón de ver contraseña podría afectar a ambos o tener uno propio */}
             </div>
+            {confirmPassword.length > 0 && (
+              <p className={`text-xs mt-1 ${passwordsMatch ? 'text-green-600' : 'text-red-500'}`}>
+                {passwordsMatch ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden'}
+              </p>
+            )}
           </div>
         )}
 
         <button 
           type="submit" 
-          disabled={isLoading} 
+          disabled={isLoading || !isFormValid} 
           className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 mt-4 transition-colors"
         >
           {isLoading ? 'Procesando...' : (isLogin ? 'Entrar' : 'Registrarme')}
@@ -198,6 +210,7 @@ export default function Auth() {
             setErrorMsg('');
             setPassword('');
             setConfirmPassword('');
+            setPasswordsMatch(null);
           }} 
           className="ml-1 text-green-600 font-bold hover:underline"
         >

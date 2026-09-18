@@ -21,6 +21,25 @@ export default function Perfil() {
   const [loading, setLoading] = useState<boolean>(true);
   const [accessDenied, setAccessDenied] = useState<boolean>(false);
   const [comedorExistente, setComedorExistente] = useState<{ id: string; nombre: string; barrio: string } | null>(null);
+  const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [editNombre, setEditNombre] = useState('');
+  const [editTelefono, setEditTelefono] = useState('');
+  const [guardandoPerfil, setGuardandoPerfil] = useState(false);
+  const [perfilMsg, setPerfilMsg] = useState('');
+
+  const handleGuardarPerfil = async () => {
+    setGuardandoPerfil(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { error } = await supabase.from('usuario').update({ nombre: editNombre, telefono: editTelefono }).eq('id', user.id);
+      if (!error) {
+        setProfile(prev => prev ? { ...prev, nombre: editNombre, telefono: editTelefono } : prev);
+        setPerfilMsg('¡Datos actualizados!');
+        setEditandoPerfil(false);
+      }
+    }
+    setGuardandoPerfil(false);
+  };
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -153,6 +172,27 @@ export default function Perfil() {
                 {profile.email}
               </p>
             </div>
+          </div>
+          <div className="mt-4">
+            {!editandoPerfil ? (
+              <button onClick={() => { setEditNombre(profile.nombre || ''); setEditTelefono(profile.telefono || ''); setEditandoPerfil(true); }} className="text-sm text-green-600 font-semibold hover:underline">
+                ✏️ Editar mis datos
+              </button>
+            ) : (
+              <div className="space-y-3 mt-3 max-w-sm p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <input type="text" value={editNombre} onChange={e => setEditNombre(e.target.value)} placeholder="Nombre y Apellido" className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-400 outline-none" />
+                <input type="tel" value={editTelefono} onChange={e => setEditTelefono(e.target.value)} placeholder="Teléfono de contacto" className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-400 outline-none" />
+                {perfilMsg && <p className="text-green-600 text-sm">{perfilMsg}</p>}
+                <div className="flex gap-2">
+                  <button onClick={handleGuardarPerfil} disabled={guardandoPerfil} className="flex-1 bg-green-600 text-white text-sm font-bold py-2 rounded-lg hover:bg-green-700 disabled:opacity-50">
+                    {guardandoPerfil ? 'Guardando...' : 'Guardar'}
+                  </button>
+                  <button onClick={() => { setEditandoPerfil(false); setPerfilMsg(''); }} className="flex-1 bg-gray-200 text-gray-700 text-sm font-bold py-2 rounded-lg hover:bg-gray-300">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
