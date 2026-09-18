@@ -59,11 +59,21 @@ export default function Auth() {
         setRegistroExitoso(true);
       }
     } catch (error: any) {
-      // Traducir algunos errores comunes
-      if (error.message.includes('User already registered')) {
+      const msg: string = error.message || '';
+      if (msg.includes('User already registered') || msg.includes('already been registered')) {
         setErrorMsg('Ese email ya está registrado. Por favor, iniciá sesión.');
+      } else if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
+        setErrorMsg('Email o contraseña incorrectos. Verificá tus datos.');
+      } else if (msg.includes('Email not confirmed')) {
+        setErrorMsg('Tu email aún no fue confirmado. Revisá tu bandeja de entrada y hacé clic en el link que te enviamos.');
+      } else if (msg.includes('Password should be at least')) {
+        setErrorMsg('La contraseña debe tener al menos 6 caracteres.');
+      } else if (msg.includes('Unable to validate email address')) {
+        setErrorMsg('El formato del email no es válido.');
+      } else if (msg.includes('rate limit') || msg.includes('too many requests')) {
+        setErrorMsg('Demasiados intentos. Esperá unos minutos antes de intentar de nuevo.');
       } else {
-        setErrorMsg(error.message);
+        setErrorMsg('Ocurrió un error inesperado. Intentá de nuevo más tarde.');
       }
     } finally {
       setIsLoading(false);

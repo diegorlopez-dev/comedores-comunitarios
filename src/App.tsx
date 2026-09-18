@@ -7,6 +7,7 @@ import Perfil from './pages/Perfil';
 import GestionComedor from './pages/GestionComedor';
 import DirectorioComedores from './pages/DirectorioComedores';
 import PanelVoluntario from './pages/PanelVoluntario';
+import EditarComedor from './pages/EditarComedor';
 
 // Componentes de la aplicación
 
@@ -83,6 +84,7 @@ function App() {
           <Route path="/login" element={<Auth />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/gestionar-comedor" element={<GestionComedor />} />
+          <Route path="/editar-comedor" element={<EditarComedor />} />
           <Route path="/colaborar" element={<PanelVoluntario />} />
         </Routes>
       </Layout>

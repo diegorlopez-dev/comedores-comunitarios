@@ -170,12 +170,20 @@ export default function Perfil() {
                   <p className="text-lg font-bold text-amber-800">{comedorExistente.nombre}</p>
                   <p className="text-sm text-slate-500">📍 {comedorExistente.barrio}</p>
                 </div>
-                <button
-                  onClick={() => navigate('/colaborar')}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl font-bold transition"
-                >
-                  Ver Postulantes
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => navigate('/colaborar')}
+                    className="flex-1 bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl font-bold transition"
+                  >
+                    Ver Postulantes
+                  </button>
+                  <button
+                    onClick={() => navigate('/editar-comedor')}
+                    className="flex-1 bg-white border border-amber-400 text-amber-700 p-3 rounded-xl font-bold hover:bg-amber-50 transition"
+                  >
+                    ✏️ Editar Comedor
+                  </button>
+                </div>
               </>
             ) : (
               <>
