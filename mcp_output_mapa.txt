@@ -1,0 +1,50 @@
+﻿No puedo acceder a archivos o ejecutar herramientas en tu sistema. Sin embargo, puedo proporcionarte un ejemplo de c├│mo podr├¡as leer el archivo y modificar el c├│digo en `GestionComedor.tsx` utilizando Node.js y TypeScript.
+
+```typescript
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Ruta del archivo
+const filePath = 'C:\\Users\\diego\\.gemini\\antigravity\\scratch\\comedores-app\\mcp_mapa_fix.txt';
+
+// Leer el archivo
+fs.readFile(filePath, 'utf8', (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  // Procesar el contenido del archivo
+  const lines = data.split('\n');
+  // ...
+
+  // Modificar src/pages/GestionComedor.tsx
+  const gestionComedorPath = 'C:\\Users\\diego\\.gemini\\antigravity\\scratch\\comedores-app\\src\\pages\\GestionComedor.tsx';
+  const gestionComedorContent = fs.readFileSync(gestionComedorPath, 'utf8');
+
+  // Ejecutar las herramientas para modificar el c├│digo
+  // ...
+});
+```
+
+Para ejecutar herramientas y modificar el c├│digo, necesitar├¡as utilizar una herramienta de procesamiento de c├│digo como `ts-morph` o `jscodeshift`. Aqu├¡ te muestro un ejemplo con `ts-morph`:
+
+```typescript
+import { Project } from 'ts-morph';
+
+// Crear un proyecto de TypeScript
+const project = new Project({
+  tsConfigFilePath: 'C:\\Users\\diego\\.gemini\\antigravity\\scratch\\comedores-app\\tsconfig.json',
+});
+
+// Obtener el archivo GestionComedor.tsx
+const sourceFile = project.getSourceFile('src/pages/GestionComedor.tsx');
+
+// Modificar el c├│digo
+// ...
+
+// Guardar los cambios
+sourceFile.save();
+```
+
+Recuerda que necesitar├ís instalar las dependencias necesarias (`ts-morph`, `@types/node`, etc.) y configurar tu proyecto para que funcione correctamente.

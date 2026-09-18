@@ -1,0 +1,1 @@
+﻿[ERROR HTTP 402] Hub 'cerebras': {"message":"Payment required to access this resource. Visit your billing tab.","type":"payment_required_error","param":"quota","code":"payment_required"}

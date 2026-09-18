@@ -1,0 +1,15 @@
+CRÍTICO: USA LAS TOOLS DE EDICIÓN PARA MODIFICAR EL CÓDIGO. NO RESPONDAS CON TEXTO NI TUTORIALES.
+
+Problema: Cuando se crea un comedor desde `GestionComedor.tsx`, no se están guardando la `latitud` y `longitud` en Supabase, por lo que luego no aparecen en el mapa.
+
+Solución: Modifica `src/pages/GestionComedor.tsx` para geocodificar la dirección usando OpenStreetMap (Nominatim) antes de hacer el insert.
+
+Paso a paso para el código:
+1. En la función de guardado (ej. `handleSubmit` o donde llamas a `supabase.from('comedor').insert`), justo antes del insert:
+2. Haz un fetch: `const response = await fetch(\`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(direccion + ', ' + barrio + ', Argentina')}\`);`
+3. `const geoData = await response.json();`
+4. Revisa si hay resultados: `if (!geoData || geoData.length === 0) throw new Error('No pudimos encontrar la dirección exacta en el mapa. Por favor, sé más específico.');`
+5. Si hay resultados, extrae: `const lat = parseFloat(geoData[0].lat); const lon = parseFloat(geoData[0].lon);`
+6. Modifica el `.insert()` de Supabase para incluir: `latitud: lat, longitud: lon`.
+
+Ejecuta el cambio en el archivo y luego corre `npm run build` para validar.

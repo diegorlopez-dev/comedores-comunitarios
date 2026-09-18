@@ -53,10 +53,22 @@ const GestionComedor: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No estás autenticado');
 
+      // Geocodificar dirección con Nominatim antes de guardar
+      const queryGeocoding = encodeURIComponent(`${direccion}, ${barrio}, Argentina`);
+      const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${queryGeocoding}`);
+      const geoData = await geoResponse.json();
+
+      if (!geoData || geoData.length === 0) {
+        throw new Error('No pudimos encontrar la ubicación en el mapa. Por favor, verificá que la dirección y el barrio sean correctos.');
+      }
+
+      const latitud = parseFloat(geoData[0].lat);
+      const longitud = parseFloat(geoData[0].lon);
+
       // Insertar comedor y recuperar el ID con .select()
       const { data: comedorData, error: comedorError } = await supabase
         .from('comedor')
-        .insert([{ nombre, barrio, direccion, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id }])
+        .insert([{ nombre, barrio, direccion, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id, latitud, longitud }])
         .select('id')
         .single();
 
