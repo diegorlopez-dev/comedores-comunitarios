@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -26,14 +26,14 @@ const userIcon = new L.Icon({
 });
 
 export interface ComedorMapa {
+  direccion?: string;
+  dias_y_horarios?: string;
+  resena?: { puntuacion: number }[];
   id: string;
   nombre: string;
   barrio: string;
   latitud: number | null;
   longitud: number | null;
-  direccion?: string;
-  dias_y_horarios?: string;
-  resena?: { puntuacion: number }[];
 }
 
 interface MapaComedoresProps {
@@ -68,8 +68,8 @@ const MapaComedores: React.FC<MapaComedoresProps> = ({ comedores, userLocation }
           <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
             <Popup>
               <div className="text-center">
-                <strong className="text-red-600">Â¡EstÃ¡s acÃ¡!</strong>
-                <p className="text-xs text-gray-500 m-0">Tu ubicaciÃ³n actual</p>
+                <strong className="text-red-600">¡Estás acá!</strong>
+                <p className="text-xs text-gray-500 m-0">Tu ubicación actual</p>
               </div>
             </Popup>
           </Marker>
@@ -101,5 +101,3 @@ const MapaComedores: React.FC<MapaComedoresProps> = ({ comedores, userLocation }
 };
 
 export default MapaComedores;
-
-
