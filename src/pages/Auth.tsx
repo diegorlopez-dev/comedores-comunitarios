@@ -70,7 +70,7 @@ export default function Auth() {
       }
     } catch (error: any) {
       const msg: string = error.message || '';
-      if (msg.includes('User already registered') || msg.includes('already been registered')) {
+      if (msg.includes('ya está registrado') || msg.includes('User already registered') || msg.includes('already been registered')) {
         setErrorMsg('Ese email ya está registrado. Por favor, iniciá sesión.');
       } else if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
         setErrorMsg('Email o contraseña incorrectos. Verificá tus datos.');
