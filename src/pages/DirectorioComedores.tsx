@@ -166,6 +166,7 @@ const PostulacionVoluntario: React.FC = () => {
     if (error) {
       alert('Error al postularte. Es posible que ya estés anotado en este cupo.');
     } else {
+      setHasActivePostulacion(true);
       alert('¡Postulación exitosa! El referente del comedor va a recibir tu solicitud.');
       const updater = (prev: Comedor[]) => prev.map(c => ({
         ...c,
