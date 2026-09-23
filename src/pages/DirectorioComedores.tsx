@@ -35,7 +35,8 @@ interface Comedor extends ComedorMapa {
 
 const PostulacionVoluntario: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null); // Añadido
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [hasActivePostulacion, setHasActivePostulacion] = useState(false); // Añadido
   const [comedoresOriginales, setComedoresOriginales] = useState<Comedor[]>([]);
   const [comedoresMostrar, setComedoresMostrar] = useState<Comedor[]>([]);
   const [postulando, setPostulando] = useState<string | null>(null);
@@ -64,6 +65,14 @@ const PostulacionVoluntario: React.FC = () => {
           
         if (userData && (userData.rol as any)?.nombre) {
           setUserRole((userData.rol as any).nombre);
+          if ((userData.rol as any).nombre === 'voluntario') {
+            const { count } = await supabase
+              .from('colaboracion')
+              .select('*', { count: 'exact', head: true })
+              .eq('voluntario_id', data.user.id)
+              .in('estado', ['pendiente', 'confirmada']);
+            if (count && count > 0) setHasActivePostulacion(true);
+          }
         }
       }
     };
@@ -143,7 +152,10 @@ const PostulacionVoluntario: React.FC = () => {
 
     const handlePostular = async (requerimientoId: string) => {
     if (!userId) return;
-    
+    if (hasActivePostulacion) {
+      alert('Ya tenés una postulación en curso. Solo podés tener una postulación activa a la vez.');
+      return;
+    }
     setPostulando(requerimientoId);
     const { error } = await supabase.from('colaboracion').insert({
       voluntario_id: userId,
@@ -329,10 +341,10 @@ const calcularPromedioEstrellas = (resenas?: Resena[]) => {
                         {userId !== comedor.usuario_id && (
                           <button
                             onClick={() => handlePostular(req.id)}
-                            disabled={postulando === req.id}
+                            disabled={postulando === req.id || hasActivePostulacion}
                             className="ml-2 text-xs bg-green-600 text-white font-bold py-1 px-2.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
                           >
-                            {postulando === req.id ? '...' : 'Anotarme'}
+                            {postulando === req.id ? '...' : hasActivePostulacion ? 'Límite alcanzado' : 'Anotarme'}
                           </button>
                         )}
                       </div>
