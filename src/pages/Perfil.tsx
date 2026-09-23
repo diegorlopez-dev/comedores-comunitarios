@@ -250,15 +250,12 @@ export default function Perfil() {
             <p className="text-slate-700 text-sm mb-6">
               Módulo habilitado únicamente para voluntarios.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <button
                 onClick={() => navigate('/colaborar')}
                 className="bg-white p-4 rounded-xl border border-blue-200 shadow-sm font-bold text-blue-700 hover:bg-blue-50"
               >
                 Mis Postulaciones Activas
-              </button>
-              <button className="bg-white p-4 rounded-xl border border-blue-200 shadow-sm font-bold text-blue-700 hover:bg-blue-50">
-                Agregar mis Habilidades
               </button>
             </div>
           </section>
