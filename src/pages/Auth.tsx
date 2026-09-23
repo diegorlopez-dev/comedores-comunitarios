@@ -41,6 +41,18 @@ export default function Auth() {
           navigate('/perfil');
         }
       } else {
+        // Supabase no devuelve error en signUp para emails duplicados cuando
+        // la confirmación de email está activa — hay que chequearlo manualmente.
+        const { data: existingUser } = await supabase
+          .from('usuario')
+          .select('id')
+          .eq('email', email.toLowerCase().trim())
+          .maybeSingle();
+
+        if (existingUser) {
+          throw new Error('Ese email ya está registrado. Por favor, iniciá sesión.');
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
