@@ -57,7 +57,8 @@ export default function Auth() {
           email,
           password,
           options: {
-            data: { nombre, rol }
+            data: { nombre, rol },
+            emailRedirectTo: `${window.location.origin}/perfil`
           }
         });
         if (error) {
