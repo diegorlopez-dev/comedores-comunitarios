@@ -85,14 +85,7 @@ const GestionComedor: React.FC = () => {
       const latitud = parseFloat(geoData[0].lat);
       const longitud = parseFloat(geoData[0].lon);
 
-      // Validación estricta del barrio
-      const displayName = geoData[0].display_name || '';
-      const normalize = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-      
-      // Chequear si el barrio ingresado está en el resultado del mapa
-      if (!normalize(displayName).includes(normalize(barrio))) {
-        throw new Error(`El mapa ubicó esta dirección en: "${displayName}". Verificá que el barrio ingresado coincida con la ubicación real.`);
-      }
+
 
       // Insertar comedor y recuperar el ID con .select()
       const { data: comedorData, error: comedorError } = await supabase
