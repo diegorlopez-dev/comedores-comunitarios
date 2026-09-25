@@ -94,7 +94,7 @@ export default function Auth() {
 
   const isFormValid = isLogin 
     ? email.trim() !== '' && password.trim() !== ''
-    : email.trim() !== '' && password.trim() !== '' && nombre.trim() !== '' && confirmPassword.trim() !== '' && password === confirmPassword;
+    : email.trim() !== '' && password.trim() !== '' && nombre.trim() !== '' && confirmPassword.trim() !== '' && password === confirmPassword && ((rol === 'voluntario' || rol === 'referente') ? telefono.trim() !== '' : true);
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
