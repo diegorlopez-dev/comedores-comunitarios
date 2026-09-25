@@ -233,7 +233,7 @@ const calcularPromedioEstrellas = (resenas?: Resena[]) => {
         <div>
           <h2 className="text-2xl font-bold text-green-800">Encontrá un Comedor</h2>
           <p className="text-gray-600">
-            {userId ? 'Usá tu ubicación o buscá por barrio.' : 'Buscá por barrio o registrate para usar el GPS.'}
+            {userId ? 'Usá tu ubicación o buscá por barrio.' : 'Buscá por barrio o registrate para dar reseñas!'}
           </p>
         </div>
         

@@ -153,7 +153,7 @@ export default function Auth() {
                   type="tel"
                   required
                   value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
+                  onChange={(e) => setTelefono(e.target.value.replace(/\D/g, ''))}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
                   placeholder="Ej: 11 1234 5678"
                 />
