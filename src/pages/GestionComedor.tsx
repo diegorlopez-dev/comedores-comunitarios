@@ -78,6 +78,8 @@ const GestionComedor: React.FC = () => {
       }
 
       // Extraer barrio automáticamente del resultado del mapa
+      const numeroIngresado = direccion.match(/\d+/)?.[0] || '';
+      const direccionOficial = `${addr.road} ${addr.house_number || numeroIngresado}`.trim();
       const barrioDetectado = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || 'Capital Federal';
       const latitud = parseFloat(geoData[0].lat);
       const longitud = parseFloat(geoData[0].lon);
@@ -87,7 +89,7 @@ const GestionComedor: React.FC = () => {
       // Insertar comedor y recuperar el ID con .select()
       const { data: comedorData, error: comedorError } = await supabase
         .from('comedor')
-        .insert([{ nombre, barrio: barrioDetectado, direccion, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id, latitud, longitud }])
+        .insert([{ nombre, barrio: barrioDetectado, direccion: direccionOficial, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id, latitud, longitud }])
         .select('id')
         .single();
 
@@ -109,11 +111,11 @@ const GestionComedor: React.FC = () => {
         if (reqError) throw reqError;
       }
 
-      setSuccessMsg('¡Comedor guardado con éxito! Redirigiendo...');
+      setSuccessMsg(`¡Comedor guardado con éxito! Se registró la dirección: "${direccionOficial}". Si no es correcta, podés corregirla desde Editar.`);
       setNombre('');
       setDescripcion('');
       setRequerimientos([]);
-      setTimeout(() => navigate('/perfil'), 2000);
+      setTimeout(() => navigate('/perfil'), 5000);
     } catch (error: any) {
       setErrorMsg(error.message ?? 'Error al guardar el comedor');
     } finally {

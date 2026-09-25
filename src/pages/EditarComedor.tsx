@@ -68,6 +68,8 @@ const EditarComedor: React.FC = () => {
       }
 
       // Extraer barrio automáticamente
+      const numeroIngresado = direccion.match(/\d+/)?.[0] || '';
+      const direccionOficial = `${addr.road} ${addr.house_number || numeroIngresado}`.trim();
       const barrioDetectado = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || 'Capital Federal';
       let latitud = parseFloat(geoData[0].lat);
       let longitud = parseFloat(geoData[0].lon);
@@ -87,8 +89,8 @@ const EditarComedor: React.FC = () => {
 
       const { error } = await supabase.from('comedor').update(payload).eq('id', comedorId);
       if (error) throw error;
-      setSuccessMsg('¡Comedor actualizado con éxito!');
-      setTimeout(() => navigate('/perfil'), 1500);
+      setSuccessMsg(`¡Comedor actualizado con éxito! Se registró la dirección oficial: "${direccionOficial}".`);
+      setTimeout(() => navigate('/perfil'), 4000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Error al guardar los cambios.');
     } finally {
