@@ -84,9 +84,7 @@ const EditarComedor: React.FC = () => {
       
       const barrioDetectado = barrioData.barrio || 'Capital Federal';
 
-      const barrioDetectado = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || 'Capital Federal';
-      let latitud = parseFloat(geoData[0].lat);
-      let longitud = parseFloat(geoData[0].lon);
+
 
       const payload: Record<string, unknown> = {
         nombre,
