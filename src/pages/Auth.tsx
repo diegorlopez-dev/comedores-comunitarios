@@ -13,6 +13,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nombre, setNombre] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [rol, setRol] = useState('voluntario');
   
   // UI states
@@ -57,7 +58,7 @@ export default function Auth() {
           email,
           password,
           options: {
-            data: { nombre, rol },
+            data: { nombre, rol, telefono: (rol === 'voluntario' || rol === 'referente') ? telefono : null },
             emailRedirectTo: `${window.location.origin}/perfil`
           }
         });
