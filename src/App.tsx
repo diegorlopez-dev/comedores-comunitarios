@@ -8,6 +8,7 @@ import GestionComedor from './pages/GestionComedor';
 import DirectorioComedores from './pages/DirectorioComedores';
 import PanelVoluntario from './pages/PanelVoluntario';
 import EditarComedor from './pages/EditarComedor';
+import Confirmacion from './pages/Confirmacion';
 
 // Componentes de la aplicación
 
@@ -82,6 +83,7 @@ function App() {
         <Routes>
           <Route path="/" element={<DirectorioComedores />} />
           <Route path="/login" element={<Auth />} />
+          <Route path="/confirmacion" element={<Confirmacion />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/gestionar-comedor" element={<GestionComedor />} />
           <Route path="/editar-comedor" element={<EditarComedor />} />
