@@ -60,6 +60,14 @@ const EditarComedor: React.FC = () => {
         }
         latitud = parseFloat(geoData[0].lat);
         longitud = parseFloat(geoData[0].lon);
+        
+        // Validación estricta del barrio
+        const displayName = geoData[0].display_name || '';
+        const normalize = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        
+        if (!normalize(displayName).includes(normalize(barrio))) {
+          throw new Error(`El mapa ubicó esta dirección en: "${displayName}". Verificá que el barrio ingresado coincida con la ubicación real.`);
+        }
 
       const payload: Record<string, unknown> = {
         nombre,
