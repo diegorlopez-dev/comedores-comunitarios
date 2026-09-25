@@ -4,7 +4,6 @@ import { supabase } from '../supabaseClient';
 
 const EditarComedor: React.FC = () => {
   const [nombre, setNombre] = useState('');
-  const [barrio, setBarrio] = useState('');
   const [direccion, setDireccion] = useState('');
   const [diasYHorarios, setDiasYHorarios] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -27,7 +26,6 @@ const EditarComedor: React.FC = () => {
       if (data) {
         setComedorId(data.id);
         setNombre(data.nombre || '');
-        setBarrio(data.barrio || '');
         setDireccion(data.direccion || '');
         setDiasYHorarios(data.dias_y_horarios || '');
         setDescripcion(data.descripcion || '');
@@ -50,28 +48,33 @@ const EditarComedor: React.FC = () => {
       if (!/\d/.test(direccion)) {
         throw new Error('La dirección debe incluir la altura (un número válido).');
       }
-      const queryGeocoding = encodeURIComponent(`${direccion}, ${barrio}, Argentina`);
-      const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${queryGeocoding}`);
+      // Buscar solo en CABA con addressdetails
+      const queryGeocoding = encodeURIComponent(`${direccion}, Ciudad Autónoma de Buenos Aires, Argentina`);
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=ar&q=${queryGeocoding}&viewbox=-58.5312,-34.7052,-58.3341,-34.5272&bounded=1`;
+      const geoResponse = await fetch(geoUrl);
       const geoData = await geoResponse.json();
-              let latitud: number | undefined;
-        let longitud: number | undefined;
-        if (!geoData || geoData.length === 0) {
-          throw new Error('No pudimos encontrar la ubicación en el mapa. Por favor, verificá que la dirección y el barrio sean correctos.');
-        }
-        latitud = parseFloat(geoData[0].lat);
-        longitud = parseFloat(geoData[0].lon);
-        
-        // Validación estricta del barrio
-        const displayName = geoData[0].display_name || '';
-        const normalize = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        
-        if (!normalize(displayName).includes(normalize(barrio))) {
-          throw new Error(`El mapa ubicó esta dirección en: "${displayName}". Verificá que el barrio ingresado coincida con la ubicación real.`);
-        }
+
+      if (!geoData || geoData.length === 0) {
+        throw new Error('No pudimos encontrar esta dirección en Capital Federal. Verificá que la calle y altura sean correctas.');
+      }
+
+      // Validar estrictamente que sea una dirección de calle o edificio y no una estación/parque
+      const addr = geoData[0].address || {};
+      const clase = geoData[0].class;
+      const validClasses = ['highway', 'place', 'building'];
+      
+      if (!validClasses.includes(clase) || !addr.road) {
+        throw new Error('Esta dirección no fue reconocida como una calle válida (el mapa detectó una estación, parque o lugar inválido). Asegurate de poner el nombre exacto de la calle y su altura.');
+      }
+
+      // Extraer barrio automáticamente
+      const barrioDetectado = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || 'Capital Federal';
+      let latitud = parseFloat(geoData[0].lat);
+      let longitud = parseFloat(geoData[0].lon);
 
       const payload: Record<string, unknown> = {
         nombre,
-        barrio,
+        barrio: barrioDetectado,
         direccion,
         dias_y_horarios: diasYHorarios,
         descripcion,
