@@ -106,10 +106,7 @@ const EditarComedor: React.FC = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Comedor</label>
           <input required type="text" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Barrio</label>
-          <input required type="text" value={barrio} onChange={e => setBarrio(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" />
-        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
           <input type="text" value={direccion} onChange={e => setDireccion(e.target.value)} placeholder="Ej: Av. Rivadavia 1234" className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" />

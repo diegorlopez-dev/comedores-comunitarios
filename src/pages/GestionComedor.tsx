@@ -68,10 +68,13 @@ const GestionComedor: React.FC = () => {
         throw new Error('No pudimos encontrar esta dirección en Capital Federal. Verificá que la calle y la altura sean correctos.');
       }
 
-      // Validar que Nominatim haya encontrado una CALLE (no una estación, plaza, etc.)
+            // Validar estrictamente que sea una dirección de calle o edificio y no una estación/parque
       const addr = geoData[0].address || {};
-      if (!addr.road) {
-        throw new Error('La dirección ingresada no corresponde a una calle válida en Capital Federal. Usá el formato "Calle Altura" (ej: Av. Rivadavia 1234).');
+      const clase = geoData[0].class;
+      const validClasses = ['highway', 'place', 'building'];
+      
+      if (!validClasses.includes(clase) || !addr.road) {
+        throw new Error('Esta dirección no fue reconocida como una calle válida (el mapa detectó una estación, parque o lugar inválido). Asegurate de poner el nombre exacto de la calle y su altura.');
       }
 
       // Extraer barrio automáticamente del resultado del mapa
