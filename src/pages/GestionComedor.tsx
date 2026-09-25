@@ -93,8 +93,6 @@ const GestionComedor: React.FC = () => {
       const barrioData = await barrioResponse.json();
       
       const barrioDetectado = barrioData.barrio || 'Capital Federal';
-      const latitud = parseFloat(geoData[0].lat);
-      const longitud = parseFloat(geoData[0].lon);
 
 
 
