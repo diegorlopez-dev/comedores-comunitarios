@@ -108,7 +108,6 @@ const GestionComedor: React.FC = () => {
 
       setSuccessMsg('¡Comedor guardado con éxito! Redirigiendo...');
       setNombre('');
-      setBarrio('');
       setDescripcion('');
       setRequerimientos([]);
       setTimeout(() => navigate('/perfil'), 2000);

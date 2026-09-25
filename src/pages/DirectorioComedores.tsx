@@ -46,7 +46,6 @@ const PostulacionVoluntario: React.FC = () => {
   const [comentario, setComentario] = useState<string>('');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
-  const [setBarrioFiltro] = useState('');
   const [radioKm, setRadioKm] = useState<number>(0); // 0 = sin límite
 
   const navigate = useNavigate();
