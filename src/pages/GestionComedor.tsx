@@ -71,7 +71,7 @@ const GestionComedor: React.FC = () => {
             // Validar estrictamente que sea una dirección de calle o edificio y no una estación/parque
       const addr = geoData[0].address || {};
       const clase = geoData[0].class;
-      const validClasses = ['highway', 'place', 'building'];
+      const validClasses = ['highway', 'place'];
       
       if (!validClasses.includes(clase) || !addr.road) {
         throw new Error('Esta dirección no fue reconocida como una calle válida (el mapa detectó una estación, parque o lugar inválido). Asegurate de poner el nombre exacto de la calle y su altura.');
