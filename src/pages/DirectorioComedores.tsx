@@ -46,7 +46,7 @@ const PostulacionVoluntario: React.FC = () => {
   const [comentario, setComentario] = useState<string>('');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
-  const [barrioFiltro, setBarrioFiltro] = useState('');
+  const [setBarrioFiltro] = useState('');
   const [radioKm, setRadioKm] = useState<number>(0); // 0 = sin límite
 
   const navigate = useNavigate();
@@ -93,14 +93,6 @@ const PostulacionVoluntario: React.FC = () => {
 
   useEffect(() => {
     let lista = [...comedoresOriginales];
-
-    // Filtro por barrio (para todos, incluso sin login)
-    if (barrioFiltro.trim()) {
-      lista = lista.filter(c =>
-        c.barrio.toLowerCase().includes(barrioFiltro.toLowerCase())
-      );
-    }
-
     if (userLocation) {
       // Calcular distancias
       lista = lista.map(c => {
@@ -123,7 +115,7 @@ const PostulacionVoluntario: React.FC = () => {
     }
 
     setComedoresMostrar(lista);
-  }, [userLocation, radioKm, barrioFiltro, comedoresOriginales]);
+  }, [userLocation, radioKm, comedoresOriginales]);
 
   const handleObtenerUbicacion = () => {
     setBuscandoUbicacion(true);
@@ -233,19 +225,11 @@ const calcularPromedioEstrellas = (resenas?: Resena[]) => {
         <div>
           <h2 className="text-2xl font-bold text-green-800">Encontrá un Comedor</h2>
           <p className="text-gray-600">
-            {userId ? 'Usá tu ubicación o buscá por barrio.' : 'Buscá por barrio o registrate para dar reseñas!'}
+            {userId ? 'Usá el GPS para encontrar comedores cercanos.' : 'Registrate para dar reseñas y encontrar comedores cercanos.'}
           </p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3">
-          {/* Filtro por barrio - disponible para todos */}
-          <input
-            type="text"
-            value={barrioFiltro}
-            onChange={(e) => setBarrioFiltro(e.target.value)}
-            placeholder="Buscar por barrio..."
-            className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 flex-1"
-          />
           {/* Select de radio: solo para logueados con ubicación */}
           {userId && userLocation && (
             <select 

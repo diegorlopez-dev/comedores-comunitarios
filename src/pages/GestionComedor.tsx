@@ -14,7 +14,6 @@ interface RequerimientoForm {
 
 const GestionComedor: React.FC = () => {
   const [nombre, setNombre] = useState('');
-  const [barrio, setBarrio] = useState('');
   const [direccion, setDireccion] = useState('');
   const [diasYHorarios, setDiasYHorarios] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -66,7 +65,7 @@ const GestionComedor: React.FC = () => {
       const geoData = await geoResponse.json();
 
       if (!geoData || geoData.length === 0) {
-        throw new Error('No pudimos encontrar esta dirección en Capital Federal. Verificá que la calle, altura y barrio sean correctos.');
+        throw new Error('No pudimos encontrar esta dirección en Capital Federal. Verificá que la calle y la altura sean correctos.');
       }
 
       // Validar que Nominatim haya encontrado una CALLE (no una estación, plaza, etc.)
@@ -75,13 +74,8 @@ const GestionComedor: React.FC = () => {
         throw new Error('La dirección ingresada no corresponde a una calle válida en Capital Federal. Usá el formato "Calle Altura" (ej: Av. Rivadavia 1234).');
       }
 
-      // Validar que el barrio ingresado coincida con el resultado del mapa
-      const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-      const displayName = geoData[0].display_name || '';
-      if (!normalize(displayName).includes(normalize(barrio))) {
-        throw new Error(`El mapa ubicó esta dirección en: "${displayName.split(',').slice(0,3).join(',')}, ...". Verificá que el barrio sea correcto.`);
-      }
-
+      // Extraer barrio automáticamente del resultado del mapa
+      const barrioDetectado = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || 'Capital Federal';
       const latitud = parseFloat(geoData[0].lat);
       const longitud = parseFloat(geoData[0].lon);
 
@@ -90,7 +84,7 @@ const GestionComedor: React.FC = () => {
       // Insertar comedor y recuperar el ID con .select()
       const { data: comedorData, error: comedorError } = await supabase
         .from('comedor')
-        .insert([{ nombre, barrio, direccion, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id, latitud, longitud }])
+        .insert([{ nombre, barrio: barrioDetectado, direccion, dias_y_horarios: diasYHorarios, descripcion, cbu_alias: cbuAlias, usuario_id: user.id, latitud, longitud }])
         .select('id')
         .single();
 
@@ -145,18 +139,6 @@ const GestionComedor: React.FC = () => {
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Ej: Comedor San Martín"
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Barrio *</label>
-          <input
-            required
-            type="text"
-            value={barrio}
-            onChange={(e) => setBarrio(e.target.value)}
-            placeholder="Ej: Villa Lugano"
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
           />
         </div>
@@ -260,7 +242,7 @@ const GestionComedor: React.FC = () => {
 
         <button
           type="submit"
-          disabled={guardando || !nombre.trim() || !barrio.trim() || !direccion.trim() || !diasYHorarios.trim()}
+          disabled={guardando || !nombre.trim() || !direccion.trim() || !diasYHorarios.trim()}
           className="w-full bg-green-600 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-green-700 disabled:opacity-50 transition-colors"
         >
           {guardando ? 'Guardando...' : 'Guardar Comedor'}
