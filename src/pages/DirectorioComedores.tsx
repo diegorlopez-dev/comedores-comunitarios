@@ -46,6 +46,7 @@ const PostulacionVoluntario: React.FC = () => {
   const [comentario, setComentario] = useState<string>('');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
+  const [barrioFiltro, setBarrioFiltro] = useState('');
   const [radioKm, setRadioKm] = useState<number>(0); // 0 = sin límite
 
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const PostulacionVoluntario: React.FC = () => {
     }
 
     setComedoresMostrar(lista);
-  }, [userLocation, radioKm, comedoresOriginales]);
+  }, [userLocation, radioKm, barrioFiltro, comedoresOriginales]);
 
   const handleObtenerUbicacion = () => {
     setBuscandoUbicacion(true);
@@ -229,6 +230,13 @@ const calcularPromedioEstrellas = (resenas?: Resena[]) => {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            value={barrioFiltro}
+            onChange={(e) => setBarrioFiltro(e.target.value)}
+            placeholder="Buscar por barrio..."
+            className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 flex-1 min-w-[200px]"
+          />
           {/* Select de radio: solo para logueados con ubicación */}
           {userId && userLocation && (
             <select 
