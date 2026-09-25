@@ -46,15 +46,20 @@ const EditarComedor: React.FC = () => {
       if (!comedorId) throw new Error('No se encontró el comedor.');
 
       // Geocodificar si la dirección fue completada
+            // Validar que la dirección tenga al menos un número (la altura)
+      if (!/\d/.test(direccion)) {
+        throw new Error('La dirección debe incluir la altura (un número válido).');
+      }
       const queryGeocoding = encodeURIComponent(`${direccion}, ${barrio}, Argentina`);
       const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${queryGeocoding}`);
       const geoData = await geoResponse.json();
-      let latitud: number | undefined;
-      let longitud: number | undefined;
-      if (geoData && geoData.length > 0) {
+              let latitud: number | undefined;
+        let longitud: number | undefined;
+        if (!geoData || geoData.length === 0) {
+          throw new Error('No pudimos encontrar la ubicación en el mapa. Por favor, verificá que la dirección y el barrio sean correctos.');
+        }
         latitud = parseFloat(geoData[0].lat);
         longitud = parseFloat(geoData[0].lon);
-      }
 
       const payload: Record<string, unknown> = {
         nombre,

@@ -54,6 +54,11 @@ const GestionComedor: React.FC = () => {
       if (!user) throw new Error('No estás autenticado');
 
       // Geocodificar dirección con Nominatim antes de guardar
+      // Validar que la dirección tenga al menos un número (la altura)
+      if (!/\d/.test(direccion)) {
+        throw new Error('La dirección debe incluir la altura (un número válido).');
+      }
+      
       const queryGeocoding = encodeURIComponent(`${direccion}, ${barrio}, Argentina`);
       const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${queryGeocoding}`);
       const geoData = await geoResponse.json();
