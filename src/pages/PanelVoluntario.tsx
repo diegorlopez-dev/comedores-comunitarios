@@ -57,7 +57,7 @@ const PanelVoluntario: React.FC = () => {
     } else if (colabs) {
       const filtradas = colabs.filter((c: any) => {
         if (role === 'referente') {
-          return c.requerimiento?.comedor?.usuario_id === user.id;
+          return c.requerimiento?.comedor?.usuario_id === user.id && c.estado !== 'cancelada';
         }
         return c.voluntario?.id === user.id;
       });
