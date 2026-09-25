@@ -246,28 +246,27 @@ const calcularPromedioEstrellas = (resenas?: Resena[]) => {
             placeholder="Buscar por barrio..."
             className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 flex-1"
           />
-          {/* Solo para usuarios logueados */}
-          {userId && (
-            <>
-              <select 
-                value={radioKm} 
-                onChange={(e) => setRadioKm(Number(e.target.value))}
-                className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 font-medium"
-              >
-                <option value={0}>Todos los comedores</option>
-                <option value={2}>A menos de 2 km</option>
-                <option value={5}>A menos de 5 km</option>
-                <option value={10}>A menos de 10 km</option>
-              </select>
-              <button 
-                onClick={handleObtenerUbicacion}
-                disabled={buscandoUbicacion}
-                className="flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition"
-              >
-                {buscandoUbicacion ? '📍 Buscando...' : '📍 Mi ubicación'}
-              </button>
-            </>
+          {/* Select de radio: solo para logueados con ubicación */}
+          {userId && userLocation && (
+            <select 
+              value={radioKm} 
+              onChange={(e) => setRadioKm(Number(e.target.value))}
+              className="p-2.5 border border-gray-300 rounded-xl bg-white text-gray-700 outline-none focus:ring-2 focus:ring-green-400 font-medium"
+            >
+              <option value={0}>Todos los comedores</option>
+              <option value={2}>A menos de 2 km</option>
+              <option value={5}>A menos de 5 km</option>
+              <option value={10}>A menos de 10 km</option>
+            </select>
           )}
+          {/* Botón GPS: disponible para todos */}
+          <button 
+            onClick={handleObtenerUbicacion}
+            disabled={buscandoUbicacion}
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition"
+          >
+            {buscandoUbicacion ? '📍 Buscando...' : '📍 Mi ubicación'}
+          </button>
         </div>
       </div>
 
