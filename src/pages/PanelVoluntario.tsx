@@ -92,6 +92,8 @@ const PanelVoluntario: React.FC = () => {
     return <GestorVoluntariados />;
   }
 
+  const isReferente = false;
+
 
   const estadoBadge = (estado: string) => {
     const map: Record<string, string> = {
