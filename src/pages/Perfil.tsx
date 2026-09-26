@@ -215,7 +215,7 @@ export default function Perfil() {
                     onClick={() => navigate('/colaborar')}
                     className="flex-1 bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl font-bold transition"
                   >
-                    Ver Postulantes
+                    Voluntariados
                   </button>
                   <button
                     onClick={() => navigate('/editar-comedor')}
