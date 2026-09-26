@@ -1,3 +1,4 @@
+import { GestorVoluntariados } from './GestorVoluntariados';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
@@ -87,7 +88,10 @@ const PanelVoluntario: React.FC = () => {
     );
   }
 
-  const isReferente = userRole === 'referente';
+  if (userRole === 'referente') {
+    return <GestorVoluntariados />;
+  }
+
 
   const estadoBadge = (estado: string) => {
     const map: Record<string, string> = {
