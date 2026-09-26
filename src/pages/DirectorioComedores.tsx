@@ -80,7 +80,7 @@ const PostulacionVoluntario: React.FC = () => {
     const cargarComedores = async () => {
       const { data, error } = await supabase
         .from('comedor')
-        .select('id, nombre, barrio, direccion, dias_y_horarios, descripcion, cbu_alias, latitud, longitud, usuario_id, usuario:usuario_id(telefono, nombre), requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre)), resena(id, puntuacion, comentario)');
+        .select('id, nombre, barrio, direccion, dias_y_horarios, descripcion, cbu_alias, latitud, longitud, usuario_id, usuario:usuario_id(telefono, nombre), requerimiento_comedor(id, cantidad_necesaria, habilidad(id, nombre), colaboracion(estado)), resena(id, puntuacion, comentario)');
       if (!error && data) {
         setComedoresOriginales(data as unknown as Comedor[]);
         setComedoresMostrar(data as unknown as Comedor[]);
