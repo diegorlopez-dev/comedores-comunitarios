@@ -85,17 +85,37 @@ export const GestorVoluntariados: React.FC = () => {
   const agregarPuesto = async () => {
     if (!comedorId || !nuevaHabilidadId) return;
     setGuardandoNuevo(true);
-    const { error } = await supabase.from('requerimiento_comedor').insert({
-      comedor_id: comedorId,
-      habilidad_id: nuevaHabilidadId,
-      cantidad_necesaria: nuevaCantidad,
-    });
-    if (error) {
-      alert('Error al agregar el puesto: ' + error.message);
+
+    // Verificar si ya existe ese rol para este comedor
+    const existente = requerimientos.find(r => r.habilidad?.id === nuevaHabilidadId);
+
+    if (existente) {
+      // Solo sumar la cantidad al requerimiento ya existente
+      const { error } = await supabase
+        .from('requerimiento_comedor')
+        .update({ cantidad_necesaria: existente.cantidad_necesaria + nuevaCantidad })
+        .eq('id', existente.id);
+      if (error) {
+        alert('Error al actualizar el puesto: ' + error.message);
+      } else {
+        setMostrarFormNuevo(false);
+        setNuevaCantidad(1);
+        await cargarDatos();
+      }
     } else {
-      setMostrarFormNuevo(false);
-      setNuevaCantidad(1);
-      await cargarDatos();
+      // Insertar normalmente
+      const { error } = await supabase.from('requerimiento_comedor').insert({
+        comedor_id: comedorId,
+        habilidad_id: nuevaHabilidadId,
+        cantidad_necesaria: nuevaCantidad,
+      });
+      if (error) {
+        alert('Error al agregar el puesto: ' + error.message);
+      } else {
+        setMostrarFormNuevo(false);
+        setNuevaCantidad(1);
+        await cargarDatos();
+      }
     }
     setGuardandoNuevo(false);
   };
