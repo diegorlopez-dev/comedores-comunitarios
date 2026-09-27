@@ -95,6 +95,14 @@ La descripción debe ser en español argentino, empática, destacar el valor soc
     setErrorMsg('');
     setSuccessMsg('');
 
+    // Validar duplicados en las habilidades
+    const habilidadesIds = requerimientos.map(r => r.habilidad_id).filter(id => id !== '');
+    if (new Set(habilidadesIds).size !== habilidadesIds.length) {
+      setErrorMsg('No podés agregar la misma habilidad más de una vez. Revisá la lista de "Habilidades que necesitás".');
+      setGuardando(false);
+      return;
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No estás autenticado');
