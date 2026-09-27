@@ -99,7 +99,9 @@ const EditarComedor: React.FC = () => {
         payload.longitud = longitud;
       }
 
-      const { error } = await supabase.from('comedor').update(payload).eq('id', comedorId);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No estás autenticado.');
+      const { error } = await supabase.from('comedor').update(payload).eq('id', comedorId).eq('usuario_id', user.id);
       if (error) throw error;
       setSuccessMsg(`¡Comedor actualizado con éxito! Se registró la dirección oficial: "${direccionOficial}".`);
       setTimeout(() => navigate('/perfil'), 4000);
