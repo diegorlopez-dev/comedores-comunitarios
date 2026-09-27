@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function Auth() {
@@ -230,30 +230,20 @@ export default function Auth() {
         </button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-600 flex flex-col items-center gap-2">
-        <div>
-          {isLogin ? "¿No tenés cuenta?" : "¿Ya tenés cuenta?"}
-          <button 
-            onClick={() => { 
-              setIsLogin(!isLogin); 
-              setErrorMsg('');
-              setPassword('');
-              setConfirmPassword('');
-              setPasswordsMatch(null);
-            }} 
-            className="ml-1 text-green-600 font-bold hover:underline"
-          >
-            {isLogin ? "Registrate acá" : "Iniciá sesión"}
-          </button>
-        </div>
-        
-        {isLogin && (
-          <div className="mt-2 pt-4 border-t border-gray-100 w-full">
-            <Link to="/recuperar-password" className="text-gray-500 hover:text-green-600 font-medium transition">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
-        )}
+      <div className="mt-6 text-center text-sm text-gray-600">
+        {isLogin ? "¿No tenés cuenta?" : "¿Ya tenés cuenta?"}
+        <button 
+          onClick={() => { 
+            setIsLogin(!isLogin); 
+            setErrorMsg('');
+            setPassword('');
+            setConfirmPassword('');
+            setPasswordsMatch(null);
+          }} 
+          className="ml-1 text-green-600 font-bold hover:underline"
+        >
+          {isLogin ? "Registrate acá" : "Iniciá sesión"}
+        </button>
       </div>
       </>
       )}

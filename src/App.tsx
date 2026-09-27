@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Utensils, Search, UserCircle, LogIn } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import Auth from './pages/Auth';
-import RecuperarPassword from './pages/RecuperarPassword';
-import ActualizarPassword from './pages/ActualizarPassword';
 import Perfil from './pages/Perfil';
 import GestionComedor from './pages/GestionComedor';
 import DirectorioComedores from './pages/DirectorioComedores';
@@ -85,8 +83,6 @@ function App() {
         <Routes>
           <Route path="/" element={<DirectorioComedores />} />
           <Route path="/login" element={<Auth />} />
-          <Route path="/recuperar-password" element={<RecuperarPassword />} />
-          <Route path="/actualizar-password" element={<ActualizarPassword />} />
           <Route path="/confirmacion" element={<Confirmacion />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/gestionar-comedor" element={<GestionComedor />} />
