@@ -229,7 +229,7 @@ const calcularPromedioEstrellas = (resenas?: Resena[]) => {
             {userId ? 'Usá el GPS para encontrar comedores cercanos.' : 'Registrate para dar reseñas y encontrar comedores cercanos.'}
           </p>
           <span className="inline-block mt-2 bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide border border-blue-200 shadow-sm">
-            📍 Solo disponible en Capital Federal (CABA)
+            📍 Por ahora, solo disponible en Capital Federal (CABA)
           </span>
         </div>
         
