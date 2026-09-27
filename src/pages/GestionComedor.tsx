@@ -23,6 +23,7 @@ const GestionComedor: React.FC = () => {
   const [guardando, setGuardando] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [generandoIA, setGenerandoIA] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,6 +41,47 @@ const GestionComedor: React.FC = () => {
 
   const quitarRequerimiento = (index: number) => {
     setRequerimientos(requerimientos.filter((_, i) => i !== index));
+  };
+
+  const generarDescripcionConIA = async () => {
+    if (!nombre.trim()) {
+      alert('Primero escribí el nombre del comedor para que la IA pueda generar una descripción.');
+      return;
+    }
+    setGenerandoIA(true);
+    try {
+      const habilidadesNombres = requerimientos
+        .map((r) => habilidades.find((h) => h.id === r.habilidad_id)?.nombre)
+        .filter(Boolean)
+        .join(', ');
+
+      const prompt = `Sos un asistente que ayuda a redactar descripciones breves y cálidas para comedores comunitarios en Argentina.
+Generá una descripción de 2 o 3 oraciones para un comedor que se llama "${nombre}"${diasYHorarios ? `, atiende ${diasYHorarios}` : ''}${habilidadesNombres ? ` y necesita voluntarios con habilidades de: ${habilidadesNombres}` : ''}.
+La descripción debe ser en español argentino, empática, destacar el valor social del comedor y animar a la comunidad a participar. No uses signos de exclamación en exceso. No incluyas el nombre del comedor al inicio de la descripción.`;
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'llama3-8b-8192',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 200,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Error al consultar la IA.');
+      const data = await response.json();
+      const textoGenerado = data.choices?.[0]?.message?.content?.trim();
+      if (textoGenerado) setDescripcion(textoGenerado);
+    } catch (err: any) {
+      alert('No se pudo generar la descripción: ' + err.message);
+    } finally {
+      setGenerandoIA(false);
+    }
   };
 
   const handleGuardar = async (e: React.FormEvent) => {
@@ -180,12 +222,32 @@ const GestionComedor: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-medium text-gray-700">Descripción</label>
+            <button
+              type="button"
+              onClick={generarDescripcionConIA}
+              disabled={generandoIA || !nombre.trim()}
+              className="flex items-center gap-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {generandoIA ? (
+                <>
+                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Generando...
+                </>
+              ) : (
+                <>✨ Generar con IA</>
+              )}
+            </button>
+          </div>
           <textarea
             rows={3}
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
-            placeholder="Contá un poco sobre el comedor, horarios, etc."
+            placeholder="Contá un poco sobre el comedor, horarios, etc. O usá el botón ✨ para generarla automáticamente."
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none resize-none"
           />
         </div>
