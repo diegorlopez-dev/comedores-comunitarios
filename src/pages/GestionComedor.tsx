@@ -73,6 +73,9 @@ La descripción debe ser en español argentino, empática, destacar el valor soc
       if (!response.ok) {
         const errBody = await response.text();
         console.error('Gemini error status:', response.status, errBody);
+        if (response.status === 503) {
+          throw new Error('La IA está con alta demanda en este momento. Esperá unos segundos y volvé a intentarlo.');
+        }
         throw new Error(`HTTP ${response.status}: ${errBody}`);
       }
       const data = await response.json();
