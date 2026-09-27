@@ -73,11 +73,16 @@ La descripción debe ser en español argentino, empática, destacar el valor soc
         }),
       });
 
-      if (!response.ok) throw new Error('Error al consultar la IA.');
+      if (!response.ok) {
+        const errBody = await response.text();
+        console.error('Groq error status:', response.status, errBody);
+        throw new Error(`HTTP ${response.status}: ${errBody}`);
+      }
       const data = await response.json();
       const textoGenerado = data.choices?.[0]?.message?.content?.trim();
       if (textoGenerado) setDescripcion(textoGenerado);
     } catch (err: any) {
+      console.error('Error IA:', err);
       alert('No se pudo generar la descripción: ' + err.message);
     } finally {
       setGenerandoIA(false);
