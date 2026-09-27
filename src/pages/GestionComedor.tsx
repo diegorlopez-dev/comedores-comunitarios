@@ -59,27 +59,24 @@ const GestionComedor: React.FC = () => {
 Generá una descripción de 2 o 3 oraciones para un comedor que se llama "${nombre}"${diasYHorarios ? `, atiende ${diasYHorarios}` : ''}${habilidadesNombres ? ` y necesita voluntarios con habilidades de: ${habilidadesNombres}` : ''}.
 La descripción debe ser en español argentino, empática, destacar el valor social del comedor y animar a la comunidad a participar. No uses signos de exclamación en exceso. No incluyas el nombre del comedor al inicio de la descripción.`;
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'gemma2-9b-it',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 200,
-          temperature: 0.7,
-        }),
-      });
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errBody = await response.text();
-        console.error('Groq error status:', response.status, errBody);
+        console.error('Gemini error status:', response.status, errBody);
         throw new Error(`HTTP ${response.status}: ${errBody}`);
       }
       const data = await response.json();
-      const textoGenerado = data.choices?.[0]?.message?.content?.trim();
+      const textoGenerado = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       if (textoGenerado) setDescripcion(textoGenerado);
     } catch (err: any) {
       console.error('Error IA:', err);
