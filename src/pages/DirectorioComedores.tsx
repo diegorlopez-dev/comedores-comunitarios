@@ -13,6 +13,7 @@ interface Requerimiento {
   id: string;
   cantidad_necesaria: number;
   habilidad: Habilidad;
+  colaboracion?: { estado: string }[];
 }
 
 interface Resena {
