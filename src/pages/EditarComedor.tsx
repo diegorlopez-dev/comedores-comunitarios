@@ -10,6 +10,7 @@ const EditarComedor: React.FC = () => {
   const [cbuAlias, setCbuAlias] = useState('');
   const [comedorId, setComedorId] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [generandoIA, setGenerandoIA] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
@@ -34,6 +35,46 @@ const EditarComedor: React.FC = () => {
     };
     cargarComedor();
   }, [navigate]);
+
+  const generarDescripcionConIA = async () => {
+    if (!nombre) {
+      alert('Por favor, ingresá el nombre del comedor antes de generar la descripción.');
+      return;
+    }
+    setGenerandoIA(true);
+    try {
+      const prompt = `Sos un asistente que ayuda a redactar descripciones breves y cálidas para comedores comunitarios en Argentina.
+Generá una descripción de 2 o 3 oraciones para un comedor que se llama "${nombre}"${diasYHorarios ? `, atiende ${diasYHorarios}` : ''}.
+La descripción debe ser en español argentino, empática, destacar el valor social del comedor y animar a la comunidad a participar. No uses signos de exclamación en exceso. No incluyas el nombre del comedor al inicio de la descripción.`;
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errBody = await response.text();
+        if (response.status === 503) {
+          throw new Error('La IA está con alta demanda en este momento. Esperá unos segundos y volvé a intentarlo.');
+        }
+        throw new Error(`HTTP ${response.status}: ${errBody}`);
+      }
+      const data = await response.json();
+      const textoGenerado = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (textoGenerado) setDescripcion(textoGenerado);
+    } catch (err: any) {
+      console.error('Error IA:', err);
+      alert('No se pudo generar la descripción: ' + err.message);
+    } finally {
+      setGenerandoIA(false);
+    }
+  };
 
   const handleGuardar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,10 +170,20 @@ const EditarComedor: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Días y horarios de atención</label>
-          <input type="text" value={diasYHorarios} onChange={e => setDiasYHorarios(e.target.value)} placeholder="Ej: Lunes a Viernes de 12:00 a 14:00" className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" />
+          <input required type="text" value={diasYHorarios} onChange={e => setDiasYHorarios(e.target.value)} placeholder="Ej: Lunes a Viernes de 12:00 a 14:00" className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-medium text-gray-700">Descripción</label>
+            <button
+              type="button"
+              onClick={generarDescripcionConIA}
+              disabled={generandoIA || !nombre}
+              className="text-xs font-bold bg-amber-100 text-amber-800 hover:bg-amber-200 py-1 px-2.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
+            >
+              {generandoIA ? '⏳ Generando...' : '✨ Generar con IA'}
+            </button>
+          </div>
           <textarea rows={3} value={descripcion} onChange={e => setDescripcion(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" />
         </div>
         <div>
