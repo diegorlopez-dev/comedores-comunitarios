@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Utensils, Search, UserCircle, LogIn } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Utensils, Search, UserCircle, LogIn, LogOut } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import Auth from './pages/Auth';
 import Perfil from './pages/Perfil';
@@ -20,6 +20,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
   const location = useLocation();
   const path = location.pathname;
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
@@ -28,6 +29,11 @@ function Layout({ children }: { children: React.ReactNode }) {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen pb-20">
@@ -39,9 +45,18 @@ function Layout({ children }: { children: React.ReactNode }) {
             <h1 className="font-bold text-xl text-green-800">Red Solidaria</h1>
           </Link>
           {session ? (
-            <Link to="/perfil" className="flex items-center gap-1 text-sm font-medium text-green-600 hover:text-green-800">
-              <UserCircle size={18} /> Mi Perfil
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link to="/perfil" className="flex items-center gap-1 text-sm font-medium text-green-600 hover:text-green-800">
+                <UserCircle size={18} /> Mi Perfil
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors"
+                title="Cerrar Sesión"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
           ) : (
             <Link to="/login" className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-green-600">
               <LogIn size={18} /> Iniciar Sesión
