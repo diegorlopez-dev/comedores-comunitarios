@@ -66,7 +66,7 @@ La descripción debe ser en español argentino, empática, destacar el valor soc
           'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'mixtral-8x7b-32768',
+          model: 'gemma2-9b-it',
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 200,
           temperature: 0.7,
