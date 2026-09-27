@@ -146,7 +146,7 @@ const GestionComedor: React.FC = () => {
 
       <form onSubmit={handleGuardar} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Comedor *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Comedor</label>
           <input
             required
             type="text"
